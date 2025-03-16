@@ -1,0 +1,8 @@
+{
+  "login" : {
+    "title" : "Unleash AnyChat conversations",
+    "note" : "To continue, kindly login with your account",
+    "login-button" : "Sign in",
+    "signup-button" : "Sign up"
+  }
+}

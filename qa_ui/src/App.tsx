@@ -1,12 +1,10 @@
-import Home from "./pages/Home";
 import './App.css'
-
+import SignIn from "./pages/SignIn.tsx";
 function App() {
-
     return (
-        <>
-            <Home/>
-        </>
+       <div>
+           <SignIn/>
+       </div>
     )
 }
 
