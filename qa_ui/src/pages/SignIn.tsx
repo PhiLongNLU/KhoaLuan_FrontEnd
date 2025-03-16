@@ -1,22 +1,17 @@
-import { useTranslation } from 'react-i18next';
-import Icon from '../assets/icons/Image_18.svg';
+import AuthType from "../components/Authenticate/AuthType.tsx";
+import {useState} from "react";
+import SignUp from "../components/Authenticate/SignUp.tsx";
+import LogIn from "../components/Authenticate/LogIn.tsx";
 
 const SignIn = () => {
-
-    const { t } = useTranslation();
-
+    const [view, setView] = useState<"choose" | "signin" | "signup">("choose");
     return (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-            <div>
-                <div>
-                    <Icon/>
-                </div>
-                <h2>{t('login.title')}</h2>
-                <h3>{t('login.note')}</h3>
-            </div>
-            <div>
-                <button>{t('login.signup-button')}</button>
-                <button>{t('login.login-button')}</button>
+        <div className="flex items-center justify-center w-full h-screen bg-cover bg-center"
+             style={{backgroundImage : "url(../../assets/backgrounds/Sign In.jpg)"}}>
+            <div className="bg-white p-8 rounded-2xl shadow-lg text-center border-2 border-pink-300">
+                {view === "choose" ? <AuthType onChangeView={setView}/> : null}
+                {view === "signin" ? <LogIn onChangeView={setView}/> : null}
+                {view === "signup" ? <SignUp onChangeView={setView}/> : null}
             </div>
         </div>
     );

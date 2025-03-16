@@ -3,6 +3,10 @@
     "title" : "Unleash AnyChat conversations",
     "note" : "To continue, kindly login with your account",
     "login-button" : "Sign in",
-    "signup-button" : "Sign up"
+    "signup-button" : "Sign up",
+    "already-have-account" : "Already have an account?",
+    "continue-button" : "Continue",
+    "not-have-account" : "Dont have account?",
+    "create-account-button" : "Create"
   }
 }
