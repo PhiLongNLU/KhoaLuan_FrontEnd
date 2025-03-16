@@ -13,6 +13,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+  padding: 0!important;
+  margin: 0!important;
+  max-width: 100%!important;
+}
 button{
   cursor: pointer;
 }
