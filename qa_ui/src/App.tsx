@@ -1,9 +1,11 @@
 import './App.css'
-import SignIn from "./pages/SignIn.tsx";
+import Home from "./pages/Home.tsx";
+// import {Link} from "react-router-dom";
+// import SignIn from "./pages/SignIn.tsx";
 function App() {
     return (
        <div>
-           <SignIn/>
+           <Home/>
        </div>
     )
 }
