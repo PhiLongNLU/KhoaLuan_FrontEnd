@@ -4,17 +4,42 @@ import axios from 'axios';
 import GoogleLogo from "../../assets/icons/googleBtn.png";
 import AppleLogo from "../../assets/icons/appleBtn.png";
 import FacebookLogo from "../../assets/icons/facebookBtn.png";
+import {useDispatch} from "react-redux";
+import {setCredentials} from "../../store/authSlice.ts";
+import {useNavigate} from "react-router-dom";
 
 // Component con để tách logic Google Login
 const GoogleLoginButton = () => {
+    const dispatch = useDispatch()
+    const navigate = useNavigate();
+
     const login = useGoogleLogin({
-        onSuccess: async (credentialResponse) => {
+        onSuccess: async (tokenResponse) => {
             try {
-                // Gửi token đến backend để xác thực
-                const response = await axios.post(import.meta.env.VITE_REDIRECT_URI , {
-                    token: credentialResponse.access_token,
-                });
+                const userInfo = await axios.get(
+                    'https://www.googleapis.com/oauth2/v3/userinfo',
+                    { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
+                )
+                console.log("access token " + tokenResponse.access_token);
+                // 2. Send token to your backend for verification
+                const response = await axios.post("http://localhost:9000/auth/api/google", {
+                    token: tokenResponse.access_token
+                })
+
+                console.log(response)
+
+                dispatch(setCredentials({
+                    token: response.data.token, // Your backend JWT
+                    user: {
+                        id: userInfo.data.sub,
+                        name: userInfo.data.name,
+                        email: userInfo.data.email,
+                        picture: userInfo.data.picture
+                    }
+                }))
                 console.log('Đăng nhập thành công:', response.data);
+
+                navigate('/');
             } catch (error) {
                 console.error('Lỗi đăng nhập:', error);
             }

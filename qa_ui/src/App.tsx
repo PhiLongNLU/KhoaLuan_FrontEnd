@@ -1,9 +1,10 @@
 import './App.css'
-// import { Link } from 'react-router-dom';
-import SignIn from "./pages/SignIn.tsx";
+import { Outlet} from 'react-router-dom';
 function App() {
     return (
-        <SignIn/>
+        <div>
+            <Outlet />
+        </div>
     )
 }
 
