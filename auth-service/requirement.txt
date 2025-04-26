@@ -1,0 +1,4 @@
+pydantic
+httpx
+fastapi[all]
+pyjwt
