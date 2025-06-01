@@ -19,6 +19,20 @@ const initialState: AuthState = {
     isAuthenticated: false
 }
 
+export const loadUser = () : AuthState => {
+    const storedAuth = sessionStorage.getItem('auth')
+    if (storedAuth) {
+        const { token, user } = JSON.parse(storedAuth)
+        return {
+            token : token,
+            user : user,
+            isAuthenticated : true,
+        }
+    }
+    else
+        return initialState;
+}
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState,

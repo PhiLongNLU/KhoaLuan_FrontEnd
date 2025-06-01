@@ -1,5 +1,6 @@
 import React, {JSX} from "react";
 import { Search, Plus, MessageSquare, Lightbulb, Film } from "lucide-react";
+import {loadUser} from "../../store/authSlice.ts";
 
 interface ChatItemProps {
     title: string;
@@ -17,6 +18,8 @@ const ChatItem: React.FC<ChatItemProps> = ({ title, icon, isBold }) => {
 };
 
 const Sidebar: React.FC = () => {
+    const user = loadUser();
+
     return (
         <aside className="w-1/4 h-screen bg-pink-100 p-4 flex flex-col justify-between rounded-tl-3xl">
             {/* Header */}
@@ -55,7 +58,7 @@ const Sidebar: React.FC = () => {
             {/* User Info */}
             <div className="bg-white p-4 rounded-xl shadow-md flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <img src="https://i.pravatar.cc/40" alt="User Avatar" className="w-10 h-10 rounded-full" />
+                    <img src={user.user?.picture} alt="User Avatar" className="w-10 h-10 rounded-full hover:cursor-pointer hover:bg-grey-200" />
                     <div>
                         <p className="font-bold">Emily</p>
                     </div>
