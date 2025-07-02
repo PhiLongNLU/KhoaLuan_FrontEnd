@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta
 
 import httpx
-import jwt
+from jose import jwt
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from const import SECRET_KEY, ALGORITHM, CLIENT_ID
 from model import TokenData
 from google.oauth2 import id_token
 from google.auth.transport import requests
+
 
 app = FastAPI()
 
@@ -19,11 +20,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/auth/api")
+@app.get("/")
 async def root():
     return {"message": "Hello World"}
 
-@app.post("/google")
+@app.post("/auth/api/google")
 async def google(request : TokenData):
     print(request)
     access_token = request.token
