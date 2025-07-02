@@ -5,17 +5,19 @@ import {Navigate} from "react-router-dom";
 
 const Home = () => {
 
-    const user = loadUser();
+    const userData = loadUser();
 
-    if(!user) {
+    if(!userData.user) {
         return <Navigate to="/auth" />;
     }
-    return (
-        <div className={"flex"}>
-            <SideBar/>
-            <ChatScreen/>
-        </div>
-    )
+    else{
+        return (
+            <div className={"flex"}>
+                <SideBar/>
+                <ChatScreen/>
+            </div>
+        )
+    }
 }
 
 export default Home;
