@@ -1,0 +1,2 @@
+class AuthData {}
+export {AuthData}

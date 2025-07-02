@@ -1,11 +1,14 @@
 from datetime import datetime, timedelta
 
 import httpx
-import jwt
+from jose import jwt
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from const import SECRET_KEY, ALGORITHM
+from const import SECRET_KEY, ALGORITHM, CLIENT_ID
 from model import TokenData
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
 
 app = FastAPI()
 
@@ -20,12 +23,6 @@ app.add_middleware(
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
-
 
 @app.post("/auth/api/google")
 async def google(request : TokenData):
@@ -64,3 +61,36 @@ async def get_google_user_info(access_token: str):
             return response.json()
         except httpx.HTTPStatusError as e:
             raise HTTPException(status_code=400, detail="Invalid Google token")
+
+
+async def validate_google_token(token: str) -> dict:
+    """Core validation function reusable across endpoints"""
+    try:
+        id_infor = id_token.verify_oauth2_token(
+            token,
+            requests.Request(),
+            CLIENT_ID
+        )
+
+        # Verify the token was issued by Google
+        if id_infor['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise ValueError("Wrong issuer")
+
+        return {
+            "valid": True,
+            "user_info": {
+                "email": id_infor['email'],
+                "name": id_infor.get('name'),
+                "picture": id_infor.get('picture'),
+                "email_verified": id_infor.get('email_verified', False)
+            }
+        }
+    except ValueError as e:
+        return {
+            "valid": False,
+            "error": str(e)
+        }
+
+
+
+
