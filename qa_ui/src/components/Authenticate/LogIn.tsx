@@ -22,7 +22,7 @@ const GoogleLoginButton = () => {
                 )
                 console.log("access token " + tokenResponse.access_token);
                 // 2. Send token to your backend for verification
-                const response = await axios.post("http://localhost:9000/auth/api/google", {
+                const response = await axios.post("http://localhost:8000/auth/api/google", {
                     token: tokenResponse.access_token
                 })
 
