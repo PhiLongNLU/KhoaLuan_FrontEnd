@@ -2,32 +2,7 @@ import React, { useEffect, useState } from "react";
 import ChatBubble from "./ChatBubble";
 import ChatInput from "./ChatInput";
 import axios from "axios";
-
-interface MessageDto {
-  id: string;
-  conversationId: string;
-  senderType: "User" | "LLM";
-  content: string;
-  timestamp: Date;
-}
-
-interface CreateMessageDto {
-  conversationId: string;
-  content: string;
-}
-
-interface ConversationDto {
-  id: string;
-  userId: string;
-  title: string;
-  messages: MessageDto[];
-  createdAt: Date;
-  lastUpdated: Date;
-}
-
-// interface CreateConversationDto {
-//   title?: string;
-// }
+import { ConversationDto, CreateMessageDto, MessageDto } from "../../interfaces/chat.interfaces";
 
 const ChatScreen: React.FC = () => {
   const NEST_API_URL = import.meta.env.VITE_NEST_API_URL;
