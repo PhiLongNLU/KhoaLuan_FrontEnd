@@ -15,6 +15,7 @@ AUTH_SERVICE_URL = const.AUTH_SERVICE_URL
 REDIS_HOST = const.REDIS_HOST
 
 SERVICES_ROUTER= {
+    "service-name" : "domain-name"
 }
 
 #redis for token caching
