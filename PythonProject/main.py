@@ -33,36 +33,24 @@ async def validate_token(token: str) -> dict:
     # Check cache first
     cached = redis_client.get(f"token:{token}")
     if cached:
-        return {"valid": True, "user": cached.decode()}
+        return {"valid": True}
+    else :
+        return {"valid": False}
 
-    # Validate with auth service
+@app.post("/auth/google")
+async def google_auth(request: Request):
+    # Forward login request to actual backend
     async with httpx.AsyncClient() as client:
-        try:
-            response = await client.post(
-                f"{AUTH_SERVICE_URL}/validate",
-                json={"token": token},
-                timeout=2.0
-            )
-            if response.status_code == 200:
-                data = response.json()
-                # Cache valid tokens for 5 minutes
-                if data.get("valid"):
-                    redis_client.setex(
-                        f"token:{token}",
-                        300,  # TTL (5 min)
-                        data["user"]["email"]  # Or full user data
-                    )
-                return data
-            raise HTTPException(status_code=401, detail="Invalid token")
-        except httpx.RequestError:
-            raise HTTPException(status_code=503, detail="Auth service unavailable")
+        body = await request.json()
+        response = await client.post("http://localhost:8000/auth/api/google", json=body)
+    return response.json()
 
 @app.api_route("/{service}/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def gateway_proxy(
         service: str,
         path: str,
         request: Request,
-        token: str = Depends(security)
+        token: str
 ):
     # Validate token
     auth = await validate_token(token)
@@ -89,4 +77,4 @@ async def gateway_proxy(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="localhost", port=8001)
