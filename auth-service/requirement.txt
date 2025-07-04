@@ -2,3 +2,7 @@ pydantic
 httpx
 fastapi[all]
 pyjwt
+python-jose
+google-auth
+request
+uvicon

@@ -1,23 +1,33 @@
-import ChatScreen from '../components/Home/ChatScreen';
+import { Provider, useDispatch, useSelector } from "react-redux";
+import ChatScreen from "../components/Home/ChatScreen";
 import SideBar from "../components/Home/SideBar.tsx";
-import {loadUser} from "../store/authSlice.ts";
-import {Navigate} from "react-router-dom";
+import { loadUser, setCredentials } from "../store/authSlice.ts";
+import { Navigate } from "react-router-dom";
+import { AppDispatch, store } from "../store/store.ts";
 
 const Home = () => {
+  const userData = loadUser();
+  const dispatch = useDispatch<AppDispatch>();
 
-    const userData = loadUser();
+  if (!userData.user || !userData.token) {
+    return <Navigate to="/auth" />;
+  } else {
+    dispatch(
+      setCredentials({
+        token: userData.token,
+        user: userData.user,
+      })
+    );
 
-    if(!userData.user) {
-        return <Navigate to="/auth" />;
-    }
-    else{
-        return (
-            <div className={"flex"}>
-                <SideBar/>
-                <ChatScreen/>
-            </div>
-        )
-    }
-}
+    return (
+      <Provider store={store}>
+        <div className={"flex"}>
+          <SideBar />
+          <ChatScreen />
+        </div>
+      </Provider>
+    );
+  }
+};
 
 export default Home;
