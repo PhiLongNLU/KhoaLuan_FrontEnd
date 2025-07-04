@@ -12,7 +12,7 @@ export interface MessageDto {
   conversationId: string;
   senderType: 'User' | 'LLM';
   content: string;
-  timestamp: Date;
+  timestamp: string;
 }
 
 export interface CreateMessageDto {
@@ -25,8 +25,8 @@ export interface ConversationDto {
   userId: string;
   title: string;
   messages: MessageDto[]; // Lưu ý: Chúng ta sẽ không lưu messages trực tiếp trong ConversationDto khi serialize
-  createdAt: Date;
-  lastUpdated: Date;
+  createdAt: string;
+  lastUpdated: string;
 }
 
 export interface CreateConversationDto {
@@ -38,6 +38,6 @@ export interface ConversationMetaDto {
     id: string;
     userId: string;
     title: string;
-    createdAt: Date;
-    lastUpdated: Date;
+    createdAt: string;
+    lastUpdated: string;
 }
