@@ -9,8 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "proxy": "http://localhost:8000"
-  ,
+  "proxy": "http://localhost:8000",
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^2.6.0",
@@ -26,6 +25,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.3.0",
     "tailwindcss": "^4.0.9",
+    "uuid": "^11.1.0",
     "vite-plugin-svgr": "^4.3.0"
   },
   "devDependencies": {
