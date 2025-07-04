@@ -63,55 +63,31 @@ const ChatScreen: React.FC = () => {
     initialMessageContent: string
   ) => {
     setIsLoading(true);
-    try {
-      const response = await axiosInstance.post<ConversationDto>(`/chat/new`, {
-        title: initialMessageContent.substring(0, 50) + "...",
-      });
-      console.log("userId: ", userId);
-      const newConversationMeta: ConversationMetaDto = {
-        id: response.data.id,
-        userId: response.data.userId,
-        title: response.data.title,
-        createdAt: response.data.createdAt,
-        lastUpdated: response.data.lastUpdated,
-      };
 
-      // Lưu cuộc trò chuyện mới vào localStorage
-      conversationLocalStorageService.saveConversation(newConversationMeta);
+    const newConversationMeta: ConversationMetaDto = {
+      id: uuidv4(), // Tạo ID duy nhất ở frontend
+      userId: userId,
+      title:
+        initialMessageContent.substring(0, 50) +
+        (initialMessageContent.length > 50 ? "..." : ""), // Lấy 50 ký tự đầu làm tiêu đề
+      createdAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+    };
 
-      // Cập nhật Redux store với cuộc trò chuyện mới
-      dispatch(
-        setCurrentConversation({
-          conversationMeta: newConversationMeta,
-          messages: [],
-        })
-      );
+    // Lưu cuộc trò chuyện mới vào localStorage
+    conversationLocalStorageService.saveConversation(newConversationMeta);
 
-      // Tải lại danh sách cuộc trò chuyện trong Sidebar (nếu Sidebar cũng lấy từ store, không thì cần cơ chế khác)
-      // Hiện tại Sidebar sẽ tự tải lại khi user thay đổi, hoặc có thể dispatch một action riêng để Sidebar lắng nghe
-      // For now, let's assume Sidebar re-renders when conversationList changes, or user reloads page.
-      // A more robust solution might involve another Redux slice for global conversation list.
-      dispatch(trigglerConversationsReload());
+    // Cập nhật Redux store với cuộc trò chuyện mới
+    dispatch(
+      setCurrentConversation({
+        conversationMeta: newConversationMeta,
+        messages: [],
+      })
+    );
+    dispatch(trigglerConversationsReload());
 
-      return newConversationMeta.id; // Trả về ID của cuộc trò chuyện mới
-    } catch (error) {
-      console.error("Lỗi khi tạo cuộc trò chuyện mới:", error);
-      // Xử lý lỗi: Hiển thị thông báo cho người dùng
-      dispatch(
-        addMessagesToCurrentChat([
-          {
-            id: uuidv4(),
-            conversationId: "temp",
-            senderType: "LLM",
-            content: "Rất tiếc, không thể tạo cuộc trò chuyện mới.",
-            timestamp: new Date().toISOString(),
-          },
-        ])
-      );
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(false);
+    return newConversationMeta;
   };
 
   // Hàm xử lý việc gửi tin nhắn
@@ -121,15 +97,13 @@ const ChatScreen: React.FC = () => {
     }
 
     let conversationToUseId = currentConversationId;
+    let conversationMetaToUse = currentConversationMeta;
 
     // Nếu chưa có conversationId, tạo cuộc trò chuyện mới
     if (!conversationToUseId) {
-      const newConvId = await createNewConversation(currentUser.id, msg);
-      if (newConvId) {
-        conversationToUseId = newConvId;
-      } else {
-        return; // Không thể tạo cuộc trò chuyện mới, dừng lại
-      }
+      const newConv = await createNewConversation(currentUser.id, msg);
+      conversationToUseId = newConv.id;
+      conversationMetaToUse = newConv;
     }
     console.log("conversationToUseId: ", conversationToUseId);
 
@@ -143,6 +117,9 @@ const ChatScreen: React.FC = () => {
 
     // Thêm tin nhắn người dùng vào Redux store
     dispatch(addMessagesToCurrentChat([userMessage]));
+    // Thêm tin nhắn người dùng vào localStorage
+    messageLocalStorageService.addMessages(conversationToUseId, [userMessage]);
+
     setIsLoading(true);
 
     try {
@@ -152,50 +129,36 @@ const ChatScreen: React.FC = () => {
       };
 
       const response = await axios.post<MessageDto[]>(
-        `${NEST_API_URL}/chat/new`,
+        `${NEST_API_URL}/chat/message`,
         createMessageDto
       );
       console.log("response: ", response);
 
-      const [receivedUserMessage, llmMessage] = response.data;
-      console.log(response.data);
+      const llmMessage = response.data.find((m) => m.senderType === "LLM");
 
-      const messagesToDispatch: MessageDto[] = [];
-      messagesToDispatch.push({
-        ...receivedUserMessage,
-        timestamp: receivedUserMessage.timestamp,
-      });
-      messagesToDispatch.push({
-        ...llmMessage,
-        timestamp: llmMessage.timestamp,
-      });
+      if (llmMessage) {
+        // Cập nhật tin nhắn người dùng với ID thật và thêm tin nhắn LLM vào Redux store
+        dispatch(addMessagesToCurrentChat([llmMessage]));
 
-      // Cập nhật tin nhắn người dùng với ID thật và thêm tin nhắn LLM vào Redux store
-      dispatch(addMessagesToCurrentChat(messagesToDispatch));
-
-      // Lưu trữ tin nhắn vào Local Storage thông qua service
-      // Lấy lại tin nhắn sau khi đã thêm vào Redux store để đảm bảo đồng bộ
-      const updatedMessagesForLocalStorage = [
-        ...currentMessages,
-        ...messagesToDispatch,
-      ];
-      messageLocalStorageService.clearMessages(conversationToUseId); // Xóa cũ
-      messageLocalStorageService.addMessages(
-        conversationToUseId,
-        updatedMessagesForLocalStorage
-      ); // Lưu mới
+        messageLocalStorageService.addMessages(
+          conversationToUseId,
+          [llmMessage]
+        );
+      }
 
       // Cập nhật lastUpdated của cuộc trò chuyện trong localStorage
-      if (currentConversationMeta) {
+      if (conversationMetaToUse) {
         const updatedConversationMeta = {
-          ...currentConversationMeta,
+          ...conversationMetaToUse,
           lastUpdated: new Date().toISOString(),
+          title: conversationMetaToUse.title || (msg.substring(0, 50) + (msg.length > 50 ? "..." : "")),
         };
         conversationLocalStorageService.saveConversation(
           updatedConversationMeta
         );
         // Cập nhật Redux store để Sidebar có thể re-render với thông tin mới
         dispatch(updateCurrentConversationMeta(updatedConversationMeta));
+        dispatch(trigglerConversationsReload())
       }
     } catch (error) {
       console.error("Lỗi khi gửi tin nhắn:", error);

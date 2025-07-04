@@ -10,6 +10,7 @@ import {
   setCurrentConversation,
   trigglerConversationsReload,
 } from "../../store/chatSlice.ts";
+import { v4 as uuidv4 } from "uuid";
 
 interface ChatItemProps {
   conversation: ConversationMetaDto;
@@ -89,7 +90,30 @@ const Sidebar: React.FC = () => {
   };
 
   const handleNewChat = () => {
-    dispatch(clearCurrentChat());
+    if (!currentUser?.id) {
+      console.error("Không tìm thấy ID người dùng để tạo cuộc trò chuyện mới.");
+      return;
+    }
+    const newConversation: ConversationMetaDto = {
+      id: uuidv4(),
+      userId: currentUser.id,
+      title: "",
+      createdAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+    };
+
+    conversationLocalStorageService.saveConversation(newConversation);
+
+    // Cập nhật Redux store để hiển thị cuộc trò chuyện mới
+    dispatch(
+      setCurrentConversation({
+        conversationMeta: newConversation,
+        messages: [], // Cuộc trò chuyện mới chưa có tin nhắn nào
+      })
+    );
+
+    // Kích hoạt cập nhật danh sách cuộc trò chuyện trong Sidebar
+    dispatch(trigglerConversationsReload());
   };
 
   const handleDeleteConversation = (convId: string, userId: string) => {
