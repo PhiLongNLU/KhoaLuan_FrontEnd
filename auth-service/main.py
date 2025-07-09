@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import httpx
+import uvicorn
 from jose import jwt
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -91,6 +92,8 @@ async def validate_google_token(token: str) -> dict:
             "error": str(e)
         }
 
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8000)
 
 
 

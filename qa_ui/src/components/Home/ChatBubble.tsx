@@ -3,6 +3,7 @@ import React from "react";
 interface ChatBubbleProps {
     message: string;
     isUser?: boolean;
+    isLoading?:boolean
 }
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ message, isUser }) => {

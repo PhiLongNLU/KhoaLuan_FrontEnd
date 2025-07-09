@@ -5,6 +5,10 @@ auth-service/.env
 # Ignore virtual environment directory
 .venv/
 venv/
+.env
+
+node_modules/
+package-lock.json
 
 # Ignore Python cache directory
 __pycache__/

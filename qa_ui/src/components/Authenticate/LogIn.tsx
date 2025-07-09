@@ -7,6 +7,7 @@ import FacebookLogo from "../../assets/icons/facebookBtn.png";
 import {useDispatch} from "react-redux";
 import {setCredentials} from "../../store/authSlice.ts";
 import {useNavigate} from "react-router-dom";
+import Swal from "sweetalert2";
 
 // Component con để tách logic Google Login
 const GoogleLoginButton = () => {
@@ -21,12 +22,11 @@ const GoogleLoginButton = () => {
                     { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
                 )
                 console.log("access token " + tokenResponse.access_token);
+
                 // 2. Send token to your backend for verification
-                const response = await axios.post("http://localhost:8000/auth/api/google", {
+                const response = await axios.post("http://localhost:8001/auth/google", {
                     token: tokenResponse.access_token
                 })
-
-                console.log(response)
 
                 dispatch(setCredentials({
                     token: response.data.token, // Your backend JWT
@@ -39,13 +39,35 @@ const GoogleLoginButton = () => {
                 }))
                 console.log('Đăng nhập thành công:', response.data);
 
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Đăng nhập thành công',
+                    position: 'top-end',
+                    timer: 1500,
+                    timerProgressBar: true,
+                })
+
                 navigate('/');
             } catch (error) {
                 console.error('Lỗi đăng nhập:', error);
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Đăng nhập thất bại',
+                    timer: 1500,
+                    position: 'top-end',
+                    timerProgressBar: true,
+                })
             }
         },
-        onError: () => {
+        onError: async () => {
             console.error('Đăng nhập thất bại');
+            await Swal.fire({
+                icon: 'error',
+                title: 'Đăng nhập thất bại',
+                position: 'top-end',
+                timer: 1500,
+                timerProgressBar: true,
+            })
         },
     });
 
