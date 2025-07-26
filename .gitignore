@@ -1,22 +1,65 @@
-auth-service/.env
-qa_ui/.env
-auth-service/.env
+#################################
+# 📁 Root-level Ignore Rules
+#################################
 
-# Ignore virtual environment directory
-.venv/
-venv/
-.env
+.DS_Store               # macOS system files
+*.pem                  # Private keys (if any)
+*.log                  # Log files
 
-node_modules/
-package-lock.json
+.env*                  # Environment variable files
 
-# Ignore Python cache directory
-__pycache__/
+#################################
+# 📦 Node.js / Next.js (frontend/)
+#################################
 
-# Ignore specific compiled files
+# Dependencies & build artifacts
+/frontend/node_modules/
+/frontend/.next/
+frontend/out/          # Output from next export
+frontend/.turbo/       # (if using Turbopack)
+
+# Logs & debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# TypeScript build cache
+frontend/tsconfig.tsbuildinfo
+frontend/next-env.d.ts
+
+# Vercel config (optional)
+frontend/.vercel/
+
+#################################
+# 🐍 Python / FastAPI (backend/)
+#################################
+
+# Bytecode & cache
+backend/__pycache__/
+*.py[cod]
 *.pyc
 
-# Ignore IDE specific files (like PyCharm)
+# Virtual environments
+backend/.venv/
+backend/env/
+backend/venv/
+
+# Packaging & dist
+backend/build/
+backend/dist/
+backend/*.egg-info/
+
+# Test, coverage, and CI tools
+backend/.coverage
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.tox/
+
+# Logs & temp
+backend/*.log
+backend/.cache/
+
+# VS Code or IDE settings
+.vscode/
 .idea/
-node_modules/
-package-lock.json
