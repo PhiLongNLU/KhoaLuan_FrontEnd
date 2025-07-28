@@ -63,3 +63,6 @@ backend/.cache/
 # VS Code or IDE settings
 .vscode/
 .idea/
+
+# Environment variable files for backend
+backend/.env
