@@ -1,8 +1,9 @@
 import re
-from fastapi import APIRouter, status, HTTPException, Body
+from fastapi import APIRouter, status, HTTPException
 from app.models.model import UserCreate, UserOut
 from app.models.user import User as UserModel
 from app.core.security import get_password_hash
+from app.core.response import Response
 
 route = APIRouter(
     prefix="/auth",
@@ -11,7 +12,7 @@ route = APIRouter(
 
 EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 
-@route.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserOut)
+@route.post("/register", status_code=status.HTTP_201_CREATED, response_model=Response[UserOut])
 async def create_user(user: UserCreate):
     if not EMAIL_REGEX.match(user.email):
         raise HTTPException(
@@ -30,4 +31,8 @@ async def create_user(user: UserCreate):
     new_user = UserModel(email=user.email, hashed_password=hashed_password)
     await new_user.insert()
 
-    return new_user
+    return Response(
+        status_code=status.HTTP_201_CREATED,
+        message="User created successfully",
+        data=new_user
+    )
