@@ -124,4 +124,18 @@ async def reset_password(data: ResetPasswordSchema, background_tasks: Background
     await user.set({UserModel.hashed_password: hashed_password})
     await token_doc.delete()
 
+    email_subject = "Password Reset Successful"
+    email_body = f"""
+        <p>Hi {user.email},</p>
+        <p>Your password has been successfully reset.</p>
+        <p>If you did not make this change, please contact our support team immediately.</p>
+        """
+    background_tasks.add_task(
+        send_email,
+        subject=email_subject,
+        recipients=[user.email],
+        body=email_body,
+        html=email_body
+    )
+
     return Response(message="Password has been reset successfully.")
