@@ -1,10 +1,9 @@
-from uuid import UUID, uuid4
-from beanie import Document
-from pydantic import EmailStr, Field
-from pydantic import BaseModel, EmailStr, validator
+from datetime import datetime
+
+from beanie import Document, Link, PydanticObjectId
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 class User(Document):
-    id: UUID = Field(default_factory=uuid4, alias="_id")
     email: EmailStr
     hashed_password: str
 
@@ -15,12 +14,21 @@ class UserCredentials(BaseModel):
     email: EmailStr
     password: str
 
-    @validator('password')
-    def password_length(cls, v):
+    @field_validator('password')
+    @classmethod
+    def password_length(cls, v: str) -> str:
         if len(v) <= 6:
             raise ValueError('Password must be longer than 6 characters')
         return v
     
 class UserOut(BaseModel):
-    id: UUID
+    id: PydanticObjectId
     email: EmailStr
+
+class PasswordResetToken(Document):
+    token: str = Field(..., index=True, unique=True)
+    user: Link[User]
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Settings:
+        name = "password_reset_tokens"
