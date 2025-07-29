@@ -9,6 +9,7 @@ from app.core.response import Response
 from datetime import timedelta, datetime
 from app.models.token import Token
 from app.services.mail_service import send_email
+from app.models.profile import Profile
 
 route = APIRouter(
     prefix="/auth",
@@ -37,6 +38,9 @@ async def create_user(user: UserCredentials):
     hashed_password = get_password_hash(user.password)
     new_user = UserModel(email=user.email, hashed_password=hashed_password)
     await new_user.insert()
+
+    new_profile = Profile(user=new_user.id, username=user.email, phone="", avatar="", lastLogin=datetime.utcnow(), lastUpdated=datetime.utcnow())
+    await new_profile.insert()
 
     return Response(
         status_code=status.HTTP_201_CREATED,
@@ -83,7 +87,7 @@ async def forgot_password(data: ForgotPasswordSchema, background_tasks: Backgrou
 
         reset_token = str(random.randint(100000, 999999))
         
-        token_doc = PasswordResetToken(token=reset_token, user=user)
+        token_doc = PasswordResetToken(token=reset_token, user=user.id)
         await token_doc.insert()
 
         email_subject = "Password Reset Request"
