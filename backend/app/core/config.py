@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     USE_CREDENTIALS: bool = True
     VALIDATE_CERTS: bool = True
 
+    # Google
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8')
 
 settings = Settings()

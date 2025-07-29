@@ -1,7 +1,12 @@
 import re
 import random
+import secrets
 from fastapi import APIRouter, status, HTTPException, BackgroundTasks, Depends
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+
 from app.models.user import User as UserModel, UserCredentials, UserOut, PasswordResetToken
 from app.models.auth import ForgotPasswordSchema, ResetPasswordSchema
 from app.core.security import get_password_hash, verify_password, create_access_token
@@ -16,6 +21,9 @@ route = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
 )
+
+class GoogleToken(BaseModel):
+    token: str
 
 EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 
@@ -67,6 +75,55 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.email, "id": str(user.id)}, expires_delta=access_token_expires
+    )
+
+    return Token(access_token=access_token, token_type="bearer")
+
+@route.post("/google", response_model=Token)
+async def google_login(data: GoogleToken):
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            data.token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+        )
+        
+        user_email = idinfo.get("email")
+        if not user_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email not found in Google token",
+            )
+
+    except ValueError:
+        # Invalid token
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Google token",
+        )
+
+    user = await UserModel.find_one(UserModel.email == user_email)
+
+    if not user:
+        # User doesn't exist, create a new one
+        # Generate a secure, unusable password for Google-based accounts
+        unusable_password = secrets.token_hex(16)
+        hashed_password = get_password_hash(unusable_password)
+
+        new_user = UserModel(email=user_email, hashed_password=hashed_password)
+        await new_user.insert()
+
+        # Create a profile for the new user
+        username = idinfo.get("name", user_email)
+        avatar = idinfo.get("picture", "")
+        
+        new_profile = Profile(user=new_user.id, username=username, phone="", avatar=avatar, lastLogin=datetime.utcnow(), lastUpdated=datetime.utcnow())
+        await new_profile.insert()
+        
+        user = new_user
+    
+    # Generate and return our application's JWT
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email, "id": str(user.id)}, expires_delta=access_token_expires
