@@ -1,6 +1,7 @@
 import re
 import random
-from fastapi import APIRouter, status, HTTPException, BackgroundTasks
+from fastapi import APIRouter, status, HTTPException, BackgroundTasks, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from app.models.user import User as UserModel, UserCredentials, UserOut, PasswordResetToken
 from app.models.auth import ForgotPasswordSchema, ResetPasswordSchema
 from app.core.security import get_password_hash, verify_password, create_access_token
@@ -48,21 +49,21 @@ async def create_user(user: UserCredentials):
         data=new_user
     )
 
-@route.post("/login", response_model=Response[Token])
-async def login(form_data: UserCredentials):
-    validate_email(form_data.email)
-    user = await UserModel.find_one(UserModel.email == form_data.email)
+@route.post("/login", response_model=Token)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    validate_email(form_data.username)
+    user = await UserModel.find_one(UserModel.email == form_data.username)
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            detail="Incorrect email or password"
         )
 
     if not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -71,10 +72,7 @@ async def login(form_data: UserCredentials):
         data={"sub": user.email, "id": str(user.id)}, expires_delta=access_token_expires
     )
 
-    return Response(
-        message="Login successful",
-        data=Token(access_token=access_token, token_type="bearer")
-    )
+    return Token(access_token=access_token, token_type="bearer")
 
 @route.post("/forgot-password", status_code=status.HTTP_202_ACCEPTED, response_model=Response)
 async def forgot_password(data: ForgotPasswordSchema, background_tasks: BackgroundTasks):
