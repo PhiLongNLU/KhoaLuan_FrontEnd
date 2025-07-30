@@ -4,6 +4,7 @@ from beanie import Document, Link, PydanticObjectId
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 class User(Document):
+    id: PydanticObjectId = Field(default_factory=PydanticObjectId, alias="_id")
     email: EmailStr
     hashed_password: str
 

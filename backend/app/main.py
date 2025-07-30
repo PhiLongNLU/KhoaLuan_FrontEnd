@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 import uvicorn
 
 from app.db.mongo import init_db
-from app.routes import auth, mail, user
+from app.routes import auth, mail, user, conversation, message
 from app.core.response import Response
 
 app = FastAPI()
@@ -48,10 +48,11 @@ async def generic_exception_handler(request: Request, exc: Exception):
         ).model_dump(),
     )
 
-
 app.include_router(auth.route)
 app.include_router(mail.route)
 app.include_router(user.route)
+app.include_router(conversation.route)
+app.include_router(message.route)
 
 @app.get("/", tags=["Root"], response_model=Response[dict])
 async def root():
