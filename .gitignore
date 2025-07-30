@@ -66,3 +66,6 @@ backend/.cache/
 
 # Environment variable files for backend
 backend/.env
+
+# Environment variable files for frontend
+frontend/.env
