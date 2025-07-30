@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
-from app.models.user import User as UserModel, UserCredentials, UserOut, PasswordResetToken
+from app.models.user import User as UserModel, UserOut, PasswordResetToken
 from app.models.auth import ForgotPasswordSchema, ResetPasswordSchema
 from app.core.security import get_password_hash, verify_password, create_access_token
 from app.core.config import settings
@@ -35,20 +35,20 @@ def validate_email(email: str):
         )
 
 @route.post("/register", status_code=status.HTTP_201_CREATED, response_model=Response[UserOut])
-async def create_user(user: UserCredentials):
-    validate_email(user.email)
-    existing_user = await UserModel.find_one(UserModel.email == user.email)
+async def create_user(form_data: OAuth2PasswordRequestForm = Depends()):
+    validate_email(form_data.username)
+    existing_user = await UserModel.find_one(UserModel.email == form_data.username)
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="User with this email already exists"
         )
 
-    hashed_password = get_password_hash(user.password)
-    new_user = UserModel(email=user.email, hashed_password=hashed_password)
+    hashed_password = get_password_hash(form_data.password)
+    new_user = UserModel(email=form_data.username, hashed_password=hashed_password)
     await new_user.insert()
 
-    new_profile = Profile(user=new_user.id, username=user.email, phone="", avatar="", lastLogin=datetime.utcnow(), lastUpdated=datetime.utcnow())
+    new_profile = Profile(user=new_user.id, username=form_data.username, phone="", avatar="", lastLogin=datetime.utcnow(), lastUpdated=datetime.utcnow())
     await new_profile.insert()
 
     return Response(
@@ -59,6 +59,7 @@ async def create_user(user: UserCredentials):
 
 @route.post("/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    print(form_data.username, form_data.password)
     validate_email(form_data.username)
     user = await UserModel.find_one(UserModel.email == form_data.username)
 
