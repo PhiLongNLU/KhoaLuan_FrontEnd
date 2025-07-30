@@ -1,0 +1,41 @@
+{
+  "welcome": {
+    "unleashConversations": "Unleash AnyChat Conversations",
+    "continueLogin": "To continue, kindly log in with your account",
+    "signUp": "Sign up",
+    "signIn": "Sign in",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email address",
+    "passwordNoWhitespace": "Password must not contain spaces",
+    "passwordMaxLength": "Password must be at most 15 characters",
+    "passwordMismatch": "Passwords do not match",
+    "passwordRequired": "Password is required",
+    "accountCreated": "Account created successfully!",
+    "accountCreateFailed": "Account creation failed. Please try again.",
+    "accountAlreadyExist": "Account already exists. Please sign in",
+    "invalidCredentials": "The email or password you entered is incorrect. Please try again.",
+    "loginSuccess": "Login successful!"
+  },
+  "signIn": {
+    "welcomeBack": "Welcome back",
+    "or": "Or",
+    "signIn": "Sign in",
+    "needAccount": "Need to create an account?",
+    "signUp": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "enterPassword": "Enter your password"
+  },
+  "signUp": {
+    "createAccount": "Create your account",
+    "or": "Or",
+    "continue": "Continue",
+    "alreadyHaveAccount": "Already have an account?",
+    "signUp": "Sign up",
+    "signIn": "Sign in",
+    "create": "Create",
+    "password": "Password",
+    "enterPassword": "Enter your password",
+    "retypePassword": "Retype password"
+  }
+}

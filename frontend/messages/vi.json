@@ -1,0 +1,40 @@
+{
+  "welcome": {
+    "unleashConversations": "Thỏa sức trò chuyện với AnyChat",
+    "continueLogin": "Để tiếp tục, vui lòng đăng nhập bằng tài khoản của bạn",
+    "signUp": "Đăng ký",
+    "signIn": "Đăng nhập",
+    "emailRequired": "Email không được để trống",
+    "emailInvalid": "Email không hợp lệ",
+    "passwordNoWhitespace": "Mật khẩu không được chứa khoảng trắng",
+    "passwordMaxLength": "Mật khẩu tối đa 15 ký tự",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "passwordRequired": "Mật khẩu không được để trống",
+    "accountCreated": "Tạo tài khoản thành công!",
+    "accountCreateFailed": "Tạo tài khoản thất bại. Vui lòng thử lại.",
+    "accountAlreadyExist": "Tài khoản đã tồn tại. Vui lòng đăng nhập hoặc sử dụng tài khoản khác",
+    "invalidCredentials": "Email hoặc mật khẩu bạn đã nhập không chính xác. Vui lòng thử lại.",
+    "loginSuccess": "Đăng nhập thành công!"
+  },
+  "signIn": {
+    "welcomeBack": "Chào mừng trở lại",
+    "or": "Hoặc",
+    "signIn": "Đăng nhập",
+    "needAccount": "Bạn cần tạo tài khoản?",
+    "signUp": "Đăng ký",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "enterPassword": "Nhập mật khẩu của bạn"
+  },
+  "signUp": {
+    "createAccount": "Tạo tài khoản của bạn",
+    "or": "Hoặc",
+    "continue": "Tiếp tục",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "signUp": "Đăng ký",
+    "create": "Tạo",
+    "password": "Mật khẩu",
+    "enterPassword": "Nhập mật khẩu của bạn",
+    "retypePassword": "Nhập lại mật khẩu"
+  }
+}
