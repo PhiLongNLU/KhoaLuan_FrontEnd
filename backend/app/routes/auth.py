@@ -14,6 +14,7 @@ from app.core.config import settings
 from app.core.response import Response
 from datetime import timedelta, datetime
 from app.models.token import Token
+from app.routes.user import get_current_user
 from app.services.mail_service import send_email
 from app.models.profile import Profile
 
@@ -199,3 +200,11 @@ async def reset_password(data: ResetPasswordSchema, background_tasks: Background
     )
 
     return Response(message="Password has been reset successfully.")
+
+@route.get("/verify", response_model=Response[bool])
+async def verify_token(current_user: UserModel = Depends(get_current_user)):
+    """
+    Verifies the validity of the JWT token.
+    Returns true if the token is valid, otherwise raises a 401 exception.
+    """
+    return Response(data=True)

@@ -1,5 +1,4 @@
 import axiosInstance from "@/lib/api";
-import response from "@/types/response";
 import { User, UserAuth } from "@/types/user";
 import { useTranslations } from "next-intl";
 
@@ -60,8 +59,6 @@ class AuthService {
   };
 
   public getAccount = async (token: string) => {
-    console.log(`auth service: getAccount: ${token}`);
-
     try {
       const response = await axiosInstance.get("/users/me", {
         headers: {
@@ -85,8 +82,22 @@ class AuthService {
     }
   };
 
-  public verify = async () => {
-    alert("auth service: verify");
+  public verify = async (token: string): Promise<boolean> => {
+    try {
+      const response = await axiosInstance.get("/auth/verify", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.data && typeof response.data.data === "boolean") {
+        console.log("Auth Service: Kết quả xác thực:", response.data.data);
+        return response.data.data;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
   };
 }
 export default AuthService;
