@@ -119,7 +119,6 @@ const AuthFlow = () => {
       setErrors((prev) => ({ ...prev, email: emailError }));
       setTouched((prev) => ({ ...prev, email: true }));
       setLoading(false)
-      router.push("/")
     }
 
     try {
@@ -127,7 +126,7 @@ const AuthFlow = () => {
       const response = await authService.login({ email: profile.email, password: hash });
       sessionStorage.setItem("access_token", response.access_token)
       toast.success(t("loginSuccess"))
-      setCurrentStep(1)
+      router.replace("/")
     } catch (error: any) {
       toast.error(error.message)
     } finally {

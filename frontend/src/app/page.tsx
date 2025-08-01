@@ -2,36 +2,47 @@
 import { useEffect, useState } from "react";
 import AuthService from "@/services/auth.service";
 import SpinnerOverlay from "@/components/Share/spinnerOverlay";
-import AuthPage from "./auth/page";
-import { User } from "@/types/user";
-import MainPage from "@/components/Main/main";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const authService = AuthService.getInstance();
-  const [user, setUser] = useState<User>()
+  const [token, setToken] = useState<string>()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const verification = async () => {
-    setLoading(true)
-    const token = sessionStorage.getItem("access_token")
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      setLoading(true);
+      const tokenRes = sessionStorage.getItem("access_token");
 
-    if (token) {
-      setUser(await authService.getAccount(token))
-    }
+      if (tokenRes) {
+        const isValidToken = await authService.verify(tokenRes);
 
-    setLoading(false)
+        if (isValidToken) {
+          setIsAuthenticated(true);
+          router.replace("/home");
+        } else {
+          setIsAuthenticated(false);
+          router.replace("/auth");
+        }
+      } else {
+        setIsAuthenticated(false);
+        router.replace("/auth");
+      }
+      setLoading(false);
+    };
+
+    checkAuthentication();
+  }, [router])
+
+  if (loading) {
+    return <SpinnerOverlay />;
   }
 
-  useEffect(() => {
-    verification();
-  }, [])
-
   return (
-    <>
-      {user ? (
-        <MainPage />
-      ) : (<><AuthPage />
-        {loading && (<SpinnerOverlay />)}</>)}
-    </>
-  )
+    <div style={{ display: 'none' }}>
+
+    </div>
+  );
 }
