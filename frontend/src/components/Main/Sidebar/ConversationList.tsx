@@ -9,6 +9,7 @@ import { User } from '@/types/user'
 import ConversationService from '@/services/conversation.service'
 import { toast } from 'react-toastify'
 import { ConversationSimple } from '@/types/conversation'
+import { useTranslations } from 'next-intl'
 
 interface ConverstationListProp {
   setIsLoading: (isLoading: boolean) => void
@@ -19,6 +20,7 @@ const ConversationList = ({
   ...props
 }: ConverstationListProp) => {
 
+  const t = useTranslations('conversation')
   const conversationService = ConversationService.getInstance()
   const [profile, setProfile] = useState<User>()
   const [conversations, setConversations] = useState<ConversationSimple[]>([])
@@ -41,12 +43,18 @@ const ConversationList = ({
     fetchConversations();
   }, []);
 
-  const handleSearch = ()=>{
+  const handleSearch = () => {
 
   }
 
-  const handleCreate = ()=>{
-
+  const handleCreate = async () => {
+    try {
+      const response = await conversationService.createConversation()
+      setConversations(prev => [response, ...prev])
+      toast.success(t('create.success'))
+    } catch (error: any) {
+      toast.error(t('create.failure'))
+    }
   }
 
   return (
@@ -82,8 +90,8 @@ const ConversationList = ({
                 key={conversation.id}
                 id={conversation.id}
                 title={conversation.title}
-                // icon={conversation.icon}
-                // selected={conversation.selected}
+              // icon={conversation.icon}
+              // selected={conversation.selected}
               />
             )
             )

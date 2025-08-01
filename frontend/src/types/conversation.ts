@@ -1,4 +1,4 @@
-interface Conversation {
+export interface Conversation {
   id: string;
   userId: string;
   title: string;
@@ -7,4 +7,7 @@ interface Conversation {
   lastUpdated: Date;
 }
 
-export default Conversation;
+export interface ConversationSimple  {
+  id: string;
+  title: string;
+}
