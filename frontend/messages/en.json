@@ -37,5 +37,19 @@
     "password": "Password",
     "enterPassword": "Enter your password",
     "retypePassword": "Retype password"
+  },
+  "conversation": {
+    "create": {
+      "success": "New conversation created successfully!",
+      "failure": "Failed to create new conversation. Please try again."
+    },
+    "delete": {
+      "success": "Conversation deleted successfully!",
+      "failure": "Failed to delete conversation. Please try again."
+    },
+    "rename": {
+      "success": "Conversation renamed successfully!",
+      "failure": "Failed to rename conversation. Please try again."
+    }
   }
 }

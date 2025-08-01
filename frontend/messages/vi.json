@@ -36,5 +36,19 @@
     "password": "Mật khẩu",
     "enterPassword": "Nhập mật khẩu của bạn",
     "retypePassword": "Nhập lại mật khẩu"
+  },
+  "conversation": {
+    "create": {
+      "success": "Tạo cuộc trò chuyện mới thành công!",
+      "failure": "Tạo cuộc trò chuyện mới thất bại. Vui lòng thử lại."
+    },
+    "delete": {
+      "success": "Xóa cuộc trò chuyện thành công!",
+      "failure": "Xóa cuộc trò chuyện thất bại. Vui lòng thử lại."
+    },
+    "rename": {
+      "success": "Đổi tên cuộc trò chuyện thành công!",
+      "failure": "Đổi tên cuộc trò chuyện thất bại. Vui lòng thử lại."
+    }
   }
 }
