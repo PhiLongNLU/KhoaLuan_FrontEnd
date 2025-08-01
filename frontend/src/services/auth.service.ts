@@ -66,8 +66,6 @@ class AuthService {
         },
       });
 
-      console.log("data: ", response.data);
-
       return {
         id: response.data.id,
         username: response.data.username,
