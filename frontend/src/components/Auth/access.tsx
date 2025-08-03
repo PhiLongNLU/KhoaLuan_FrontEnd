@@ -54,7 +54,7 @@ const AccessAccount = ({
         onChange={e => setRePassword(e.target.value)}
         messageError={errorRePassword}
       />
-      <SubmitButton title={t("create")} onClick={onContinue} />
+      <SubmitButton parentClassname='mb-3' title={t("create")} onClick={onContinue} />
       <SubText text={[t("alreadyHaveAccount"), t("signIn")]} onNavigate={() => {setCurrentStep(0); setAuthType("signin")}} />
     </div>
   )

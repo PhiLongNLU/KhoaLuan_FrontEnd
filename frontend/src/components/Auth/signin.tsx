@@ -59,7 +59,7 @@ const SignIn = ({
         messageError={errorPassword}
         placeholder="Enter your password"
       />
-      <SubmitButton title={t("signIn")} onClick={signInAction} />
+      <SubmitButton parentClassname="mb-3" title={t("signIn")} onClick={signInAction} />
       <SubText text={[t("needAccount"), t("signUp")]} onNavigate={() => { setCurrentStep(2); setAuthType("signup") }} />
     </div>
   );

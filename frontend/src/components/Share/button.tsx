@@ -3,9 +3,10 @@ interface SubmitButtonProp
   title: string;
   mode?: "light" | "dark";
   onClick?: () => void;
+  parentClassname?: string;
 }
 
-const SubmitButton = ({ title, mode, onClick, ...props }: SubmitButtonProp) => {
+const SubmitButton = ({ title, mode, onClick, parentClassname, ...props }: SubmitButtonProp) => {
 
     const getColorWMode = () => {
     return mode === "light" 
@@ -17,7 +18,7 @@ const SubmitButton = ({ title, mode, onClick, ...props }: SubmitButtonProp) => {
     <button
       {...props}
       onClick={onClick}
-      className={`w-full font-medium rounded-lg text-base px-5 py-2.5 ${getColorWMode()}`}
+      className={`w-full font-medium rounded-lg text-base px-5 py-2.5 ${getColorWMode()} ${parentClassname}`}
     >
       {title}
     </button>

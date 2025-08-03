@@ -39,7 +39,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({
         onChange={e => setEmail(e.target.value)}
         messageError={errorEmail}
       />
-      <SubmitButton title={t("continue")} onClick={onContinue} />
+      <SubmitButton parentClassname="mb-3" title={t("continue")} onClick={onContinue} />
       <SubText text={[t("alreadyHaveAccount"), t("signIn")]} onNavigate={() => { setCurrentStep(0); setAuthType("signin") }} />
     </div>
   );
