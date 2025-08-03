@@ -19,9 +19,16 @@ export const conversationApi = createApi({
       query: () => "/conversations/",
       providesTags: ["Conversation"],
       transformResponse: (response: any) => {
-        return response.data;
-      },
+        const raw: {
+          _id: string;
+          title: string;
+        }[] = response.data || [];
 
+        return raw.map((c) => ({
+          id: c._id?.toString() ?? "",
+          title: c.title,
+        }));
+      },
     }),
     createConversation: builder.mutation<
       ConversationSimple,
