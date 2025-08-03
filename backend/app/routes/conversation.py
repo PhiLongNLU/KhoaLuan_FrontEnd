@@ -26,7 +26,7 @@ async def get_conversations(current_user: User = Depends(get_current_user)):
     """
     conversations = await Conversation.find(
         Conversation.user.id == current_user.id
-    ).project(ConversationOutSimple).to_list()
+    ).sort(-Conversation.last_updated).project(ConversationOutSimple).to_list()
     return Response(data=conversations)
 
 @route.get("/{conversation_id}", response_model=Response[ConversationOut])
