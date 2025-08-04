@@ -1,9 +1,13 @@
-interface Message {
+export interface Message {
   id: string;
   conversationId: string;
   role: "user" | "ai";
   content: string;
-  timestamp: Date;
+  createdAt: Date;
 }
 
-export default Message;
+export interface MessageSimple {
+  conversationId: string,
+  role: "user" | "ai",
+  content: string,
+}
