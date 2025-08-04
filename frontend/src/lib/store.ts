@@ -1,13 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { conversationApi } from "@/store/api/conversationApi";
+import { messageApi } from "@/store/api/messageApi";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       [conversationApi.reducerPath]: conversationApi.reducer,
+      [messageApi.reducerPath]: messageApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(conversationApi.middleware),
+      getDefaultMiddleware()
+        .concat(conversationApi.middleware)
+        .concat(messageApi.middleware),
   });
 };
 
