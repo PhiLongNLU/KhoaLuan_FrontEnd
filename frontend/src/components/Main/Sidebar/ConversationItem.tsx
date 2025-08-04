@@ -27,7 +27,7 @@ const ConversationItem = ({ id, title, icon = "default", selected, onSelected, o
             <div>
                 <Icon icon={getIcon()} width={25} height={25} />
             </div>
-            <span className={clsx('flex-grow text-sm truncate', { 'font-bold': selected })}>{title}</span>
+            <span className={clsx('flex-grow text-sm truncate', { 'font-bold': selected }, "cursor-pointer")}>{title}</span>
             <span>
                 <Icon icon={"iconoir:cancel"} />
             </span>

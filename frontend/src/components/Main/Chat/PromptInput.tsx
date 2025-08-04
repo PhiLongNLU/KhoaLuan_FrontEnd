@@ -2,7 +2,11 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 import clsx from 'clsx';
 import React, { useState } from 'react'
 
-const PromptInput = () => {
+interface PromptInputProps {
+    onSendMessage: (message: string) => void;
+}
+
+const PromptInput = ({ onSendMessage, ...props }: PromptInputProps) => {
 
     const iconSize = 25
 
@@ -10,6 +14,7 @@ const PromptInput = () => {
 
     const handleSend = () => {
         if (message.trim() !== "") {
+            onSendMessage(message.trim());
             setMessage("");
         }
     };
@@ -27,7 +32,10 @@ const PromptInput = () => {
                 className="bg-red-200 flex-grow focus:outline-none text-gray-900 bg-white"
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
-            <div>
+            <div
+                className="cursor-pointer"
+                onClick={handleSend}
+            >
                 <Icon icon={"mynaui:send-solid"} width={iconSize} height={iconSize} />
             </div>
         </div>
