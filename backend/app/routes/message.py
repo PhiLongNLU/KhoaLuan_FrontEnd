@@ -1,16 +1,29 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from beanie import PydanticObjectId
 from typing import List
+import httpx
+from huggingface_hub import InferenceClient
 
 from app.models.message import Message, MessageCreate, MessageOut
 from app.models.conversation import Conversation
 from app.models.user import User
 from app.routes.user import get_current_user
 from app.core.response import Response
+from app.core.config import settings
 
 route = APIRouter(
     prefix="/messages",
     tags=["Messages"]
+)
+
+HUGGING_FACE_API_KEY = settings.HUGGING_FACE_API_KEY
+HUGGING_FACE_MODEL_ID = settings.HUGGING_FACE_MODEL_ID
+
+print("HUGGING_FACE_API_KEY: ", HUGGING_FACE_API_KEY, " - ", "HUGGING_FACE_MODEL_ID: ", HUGGING_FACE_MODEL_ID)
+
+client = InferenceClient(
+    model=HUGGING_FACE_MODEL_ID,
+    token=HUGGING_FACE_API_KEY
 )
 
 @route.get("/conversation/{conversation_id}/ids", response_model=Response[List[PydanticObjectId]])
@@ -61,13 +74,27 @@ async def create_message(message_data: MessageCreate, current_user: User = Depen
     if not conversation:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found or you don't have permission")
 
-    # TODO: Later logic can be added to define sender_type as "Bot"
-    new_message = Message(**message_data.model_dump(exclude={"conversation_id"}), conversation=conversation.id)
-    await new_message.insert()
+    new_user_message = Message(**message_data.model_dump(exclude={"conversation_id"}), conversation=conversation.id, sender_type="User")
+    await new_user_message.insert()
+
+    try:
+        completion = client.chat.completions.create(
+            model=client.model,
+            messages=[
+                {"role": "user", "content": message_data.content}
+            ],
+        )
+        chatbot_response_content = completion.choices[0].message.content
+    except Exception as e:
+        # Xử lý lỗi nếu việc gọi API Hugging Face thất bại
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get response from chatbot: {e}")
+
+    new_bot_message = Message(conversation=conversation.id, sender_type="Bot", content=chatbot_response_content)
+    await new_bot_message.insert()
 
     await conversation.update_last_updated()
 
-    return Response(status_code=status.HTTP_201_CREATED, message="Message created successfully", data=new_message)
+    return Response(status_code=status.HTTP_201_CREATED, message="Message created successfully with bot response", data=new_bot_message)
 
 @route.delete("/{message_id}", response_model=Response)
 async def delete_message(message_id: PydanticObjectId, current_user: User = Depends(get_current_user)):

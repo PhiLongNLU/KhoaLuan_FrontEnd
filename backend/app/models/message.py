@@ -35,5 +35,4 @@ class MessageOut(BaseModel):
 
 class MessageCreate(BaseModel):
     conversation_id: PydanticObjectId
-    sender_type: str # "User" or "Bot"
     content: str

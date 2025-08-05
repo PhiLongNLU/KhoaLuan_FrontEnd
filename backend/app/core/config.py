@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str
 
+    # HuggingFace
+    HUGGING_FACE_API_KEY: str
+    HUGGING_FACE_MODEL_ID: str = "deepseek-ai/DeepSeek-V3-0324"
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8')
 
 settings = Settings()
