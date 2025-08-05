@@ -1,2 +1,0 @@
-class AuthData {}
-export {AuthData}
