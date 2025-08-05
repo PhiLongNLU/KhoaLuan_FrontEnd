@@ -1,0 +1,73 @@
+{
+  "welcome": {
+    "unleashConversations": "Thỏa sức trò chuyện với AnyChat",
+    "continueLogin": "Để tiếp tục, vui lòng đăng nhập bằng tài khoản của bạn",
+    "signUp": "Đăng ký",
+    "signIn": "Đăng nhập",
+    "emailRequired": "Email không được để trống",
+    "emailInvalid": "Email không hợp lệ",
+    "passwordNoWhitespace": "Mật khẩu không được chứa khoảng trắng",
+    "passwordMaxLength": "Mật khẩu tối đa 15 ký tự",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "passwordRequired": "Mật khẩu không được để trống",
+    "accountCreated": "Tạo tài khoản thành công!",
+    "accountCreateFailed": "Tạo tài khoản thất bại. Vui lòng thử lại.",
+    "accountAlreadyExist": "Tài khoản đã tồn tại. Vui lòng đăng nhập hoặc sử dụng tài khoản khác",
+    "invalidCredentials": "Email hoặc mật khẩu bạn đã nhập không chính xác. Vui lòng thử lại.",
+    "loginSuccess": "Đăng nhập thành công!"
+  },
+  "signIn": {
+    "welcomeBack": "Chào mừng trở lại",
+    "or": "Hoặc",
+    "signIn": "Đăng nhập",
+    "needAccount": "Bạn cần tạo tài khoản?",
+    "signUp": "Đăng ký",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "enterPassword": "Nhập mật khẩu của bạn"
+  },
+  "signUp": {
+    "createAccount": "Tạo tài khoản của bạn",
+    "or": "Hoặc",
+    "continue": "Tiếp tục",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "signUp": "Đăng ký",
+    "create": "Tạo",
+    "password": "Mật khẩu",
+    "enterPassword": "Nhập mật khẩu của bạn",
+    "retypePassword": "Nhập lại mật khẩu"
+  },
+  "conversation": {
+    "create": {
+      "defaultTitle": "Cuộc trò chuyện mới",
+      "success": "Tạo cuộc trò chuyện mới thành công!",
+      "failure": "Tạo cuộc trò chuyện mới thất bại. Vui lòng thử lại.",
+      "creating": "Đang tạo cuộc trò chuyện...",
+      "create-chat": "Tạo cuộc trò chuyện"
+    },
+    "delete": {
+      "success": "Xóa cuộc trò chuyện thành công!",
+      "failure": "Xóa cuộc trò chuyện thất bại. Vui lòng thử lại."
+    },
+    "rename": {
+      "success": "Đổi tên cuộc trò chuyện thành công!",
+      "failure": "Đổi tên cuộc trò chuyện thất bại. Vui lòng thử lại."
+    },
+    "empty_conversations_message": "Chưa có cuộc trò chuyện gần đây.",
+    "loading_conversations_message": "Đang tải cuộc trò chuyện...",
+    "auth": {
+      "no_token_found": "Không tìm thấy token xác thực. Vui lòng đăng nhập."
+    }
+  },
+  "chat": {
+    "get": {
+      "failure": "Lấy tin nhắn thất bại. Vui lòng thử lại."
+    },
+    "send": {
+      "failure": "Gửi tin nhắn thất bại. Vui lòng thử lại."
+    },
+    "loading_messages_message": "Đang tải tin nhắn...",
+    "welcome_title": "Chào mừng đến cuộc hội thoại",
+    "no_conversation_selected": "Chưa chọn cuộc hội thoại"
+  }
+}
