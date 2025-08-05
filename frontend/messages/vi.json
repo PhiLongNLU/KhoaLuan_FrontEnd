@@ -39,8 +39,11 @@
   },
   "conversation": {
     "create": {
+      "defaultTitle": "Cuộc trò chuyện mới",
       "success": "Tạo cuộc trò chuyện mới thành công!",
-      "failure": "Tạo cuộc trò chuyện mới thất bại. Vui lòng thử lại."
+      "failure": "Tạo cuộc trò chuyện mới thất bại. Vui lòng thử lại.",
+      "creating": "Đang tạo cuộc trò chuyện...",
+      "create-chat": "Tạo cuộc trò chuyện"
     },
     "delete": {
       "success": "Xóa cuộc trò chuyện thành công!",
@@ -49,6 +52,22 @@
     "rename": {
       "success": "Đổi tên cuộc trò chuyện thành công!",
       "failure": "Đổi tên cuộc trò chuyện thất bại. Vui lòng thử lại."
+    },
+    "empty_conversations_message": "Chưa có cuộc trò chuyện gần đây.",
+    "loading_conversations_message": "Đang tải cuộc trò chuyện...",
+    "auth": {
+      "no_token_found": "Không tìm thấy token xác thực. Vui lòng đăng nhập."
     }
+  },
+  "chat": {
+    "get": {
+      "failure": "Lấy tin nhắn thất bại. Vui lòng thử lại."
+    },
+    "send": {
+      "failure": "Gửi tin nhắn thất bại. Vui lòng thử lại."
+    },
+    "loading_messages_message": "Đang tải tin nhắn...",
+    "welcome_title": "Chào mừng đến cuộc hội thoại",
+    "no_conversation_selected": "Chưa chọn cuộc hội thoại"
   }
 }

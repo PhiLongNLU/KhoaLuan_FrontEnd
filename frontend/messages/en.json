@@ -40,8 +40,11 @@
   },
   "conversation": {
     "create": {
+      "default_title": "New Conversation",
       "success": "New conversation created successfully!",
-      "failure": "Failed to create new conversation. Please try again."
+      "failure": "Failed to create new conversation. Please try again.",
+      "creating": "Creating...",
+      "create-chat": "New chat"
     },
     "delete": {
       "success": "Conversation deleted successfully!",
@@ -50,6 +53,25 @@
     "rename": {
       "success": "Conversation renamed successfully!",
       "failure": "Failed to rename conversation. Please try again."
+    },
+    "get": {
+      "failure": "Failed to get conversations. Please try again."
+    },
+    "empty_conversations_message": "No recent conversations.",
+    "loading_conversations_message": "Loading conversations...",
+    "auth": {
+      "no_token_found": "No authentication token found. Please log in."
     }
+  },
+  "chat": {
+    "get": {
+      "failure": "Failed to fetch messages. Please try again."
+    },
+    "send": {
+      "failure": "Failed to send message. Please try again."
+    },
+    "loading_messages_message": "Loading messages...",
+    "welcome_title": "Welcome to the conversation",
+    "no_conversation_selected": "No conversation selected"
   }
 }
