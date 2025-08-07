@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     HUGGING_FACE_API_KEY: str
     HUGGING_FACE_MODEL_ID: str = "deepseek-ai/DeepSeek-V3-0324"
 
+    #RAG
+    rag_json_data: str
+    embedding_model: str
+    faiss_index_path: str
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8')
 
 settings = Settings()

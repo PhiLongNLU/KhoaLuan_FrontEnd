@@ -69,3 +69,4 @@ backend/.env
 
 # Environment variable files for frontend
 frontend/.env
+backend/app/assets/all_vector_data.json

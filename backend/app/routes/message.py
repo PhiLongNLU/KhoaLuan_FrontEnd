@@ -7,6 +7,7 @@ from huggingface_hub import InferenceClient
 from app.models.message import Message, MessageCreate, MessageOut
 from app.models.conversation import Conversation
 from app.models.user import User
+from app.rag.rag_module import RAGSingleton
 from app.routes.user import get_current_user
 from app.core.response import Response
 from app.core.config import settings
@@ -25,6 +26,8 @@ client = InferenceClient(
     model=HUGGING_FACE_MODEL_ID,
     token=HUGGING_FACE_API_KEY
 )
+
+rag = RAGSingleton()
 
 @route.get("/conversation/{conversation_id}/ids", response_model=Response[List[PydanticObjectId]])
 async def get_message_ids_in_conversation(conversation_id: PydanticObjectId, current_user: User = Depends(get_current_user)):
@@ -77,11 +80,13 @@ async def create_message(message_data: MessageCreate, current_user: User = Depen
     new_user_message = Message(**message_data.model_dump(exclude={"conversation_id"}), conversation=conversation.id, sender_type="User")
     await new_user_message.insert()
 
+    builded_prompt = rag.generate_prompt(message_data.content)
+
     try:
         completion = client.chat.completions.create(
             model=client.model,
             messages=[
-                {"role": "user", "content": message_data.content}
+                {"role": "user", "content": builded_prompt}
             ],
         )
         chatbot_response_content = completion.choices[0].message.content
