@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import WelcomeScreen from "./welcome";
 import { useTranslations } from "next-intl";
 import AccessAccount from "./access";

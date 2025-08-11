@@ -6,7 +6,7 @@ interface PromptInputProps {
     onSendMessage: (message: string) => void;
 }
 
-const PromptInput = ({ onSendMessage, ...props }: PromptInputProps) => {
+const PromptInput = ({ onSendMessage }: PromptInputProps) => {
 
     const iconSize = 25
 

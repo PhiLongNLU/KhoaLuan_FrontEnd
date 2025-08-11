@@ -33,12 +33,11 @@ const ChatWindow = ({ setIsLoading, currentConversation }: ChatWindowProps) => {
         error: fetchError,
         isSuccess: isFetchSuccess,
         isError: isFetchError,
-        refetch: refetchMessages
     } = useGetMessagesQuery(currentConversation, {
         skip: !currentConversation,
     });
 
-    const [createMessage, { isLoading: isCreatingMessage }] = useCreateMessageMutation();
+    const [createMessage, _] = useCreateMessageMutation();
 
     useEffect(() => {
         if (prevConversationRef.current !== currentConversation) {
@@ -59,7 +58,7 @@ const ChatWindow = ({ setIsLoading, currentConversation }: ChatWindowProps) => {
         if (isFetchSuccess) {
             if (fetchedMessages && fetchedMessages.length > 0) {
                 setMessages(prev => {
-                    let cleaned = prev.filter(m => {
+                    const cleaned = prev.filter(m => {
                         if (m.pending && m.role === 'user') {
                             const similar = fetchedMessages.find(fm =>
                                 fm.role === 'user' &&
