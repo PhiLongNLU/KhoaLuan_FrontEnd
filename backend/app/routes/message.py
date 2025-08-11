@@ -10,6 +10,7 @@ from app.models.user import User
 from app.routes.user import get_current_user
 from app.core.response import Response
 from app.core.config import settings
+from app.rag.rag_module import rag as rag_instance
 
 route = APIRouter(
     prefix="/messages",
@@ -70,6 +71,7 @@ async def create_message(message_data: MessageCreate, current_user: User = Depen
     """
     Create a new message in a conversation.
     """
+    global rag
     conversation = await Conversation.find_one(Conversation.id == message_data.conversation_id, Conversation.user.id == current_user.id)
     if not conversation:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found or you don't have permission")
@@ -77,11 +79,13 @@ async def create_message(message_data: MessageCreate, current_user: User = Depen
     new_user_message = Message(**message_data.model_dump(exclude={"conversation_id"}), conversation=conversation.id, sender_type="User")
     await new_user_message.insert()
 
+    rag_context = rag_instance.generate_prompt(message_data)
+
     try:
         completion = client.chat.completions.create(
             model=client.model,
             messages=[
-                {"role": "user", "content": message_data.content}
+                {"role": "user", "content": rag_context}
             ],
         )
         chatbot_response_content = completion.choices[0].message.content
