@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from beanie import PydanticObjectId
 from typing import List
-import httpx
 from huggingface_hub import InferenceClient
 
 from app.models.message import Message, MessageCreate, MessageOut

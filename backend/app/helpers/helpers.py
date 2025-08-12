@@ -1,8 +1,10 @@
 from pypdf import PdfReader
 import faiss
 from sentence_transformers import SentenceTransformer
-from fastapi import UploadFile, File
+from fastapi import UploadFile
 from app.constant import index_path, metadata_path
+from docx import Document
+from pptx import Presentation
 import numpy as np
 import json
 import re
@@ -31,6 +33,35 @@ def extract_pdf_text(file_upload: UploadFile, start_page=0, end_page=None) -> st
             full_text += text
 
     return full_text
+
+# Function to extract text from a DOCX file
+# This function reads the DOCX file and extracts text from all paragraphs
+# It returns the text as a single string with paragraphs separated by newlines
+def extract_docx_text(file_upload: UploadFile) -> str:
+    file_upload.file.seek(0)
+    doc = Document(file_upload.file)
+    full_text = []
+
+    # Extract paragraphs
+    for para in doc.paragraphs:
+        if para.text.strip():
+            full_text.append(para.text.strip())
+
+    return '\n'.join(full_text)
+
+
+def extract_pptx_text(file_upload: UploadFile) -> str:
+    file_upload.file.seek(0)
+    presentation = Presentation(file_upload.file)
+    full_text = []
+
+    # Extract text from each slide
+    for slide in presentation.slides:
+        for shape in slide.shapes:
+            if hasattr(shape, "text") and shape.text.strip():
+                full_text.append(shape.text.strip())
+
+    return '\n'.join(full_text)
 
 # Function to chunk text with context
 # This function splits the text into chunks while preserving context
@@ -133,6 +164,10 @@ def process_document_to_faiss(
     print(f"Extracting text from: {source}")
     if file_upload.filename.endswith('.pdf'):
         text = extract_pdf_text(file_upload, start_page - 1, end_page)
+    elif file_upload.filename.endswith('.docx'):
+        text = extract_docx_text(file_upload)
+    elif file_upload.filename.endswith('.pptx'):
+        text = extract_pptx_text(file_upload)
     else:
         raise ValueError("Only PDF files are supported currently.")
 
@@ -172,19 +207,20 @@ def process_document_to_faiss(
     return index, vector_data
 
 def save_faiss_index(index, file_path):
-    cpu_index = faiss.index_gpu_to_cpu(index)  
-    faiss.write_index(cpu_index, file_path)
+    # cpu_index = faiss.index_gpu_to_cpu(index)  
+    faiss.write_index(index, file_path)
     print(f"FAISS index saved to {file_path}")
 
 def load_faiss_index(file_path):
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"FAISS index file not found: {file_path}")
 
-    res = faiss.StandardGpuResources()  # Tạo resource GPU
+    # res = faiss.StandardGpuResources()  # Tạo resource GPU
     cpu_index = faiss.read_index(file_path)  # Đọc index từ file (CPU)
-    gpu_index = faiss.index_cpu_to_gpu(res, 0, cpu_index)  # Chuyển sang GPU device 0
+    # gpu_index = faiss.index_cpu_to_gpu(res, 0, cpu_index)  # Chuyển sang GPU device 0
     print(f"FAISS index loaded from {file_path}")
-    return gpu_index
+    # return gpu_index
+    return cpu_index
 
 def load_metadata(file_path):
     if not os.path.exists(file_path):
