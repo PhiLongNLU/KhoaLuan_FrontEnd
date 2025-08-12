@@ -1,10 +1,8 @@
 import axiosInstance from "@/lib/api";
 import { UserAuth } from "@/types/user";
-import { useTranslations } from "next-intl";
 
 class AuthService {
   private static instance: AuthService;
-  private t = useTranslations();
 
   public static getInstance() {
     if (!AuthService.instance) AuthService.instance = new AuthService();
@@ -24,12 +22,10 @@ class AuthService {
       });
       return response.data;
     } catch (error: any) {
-      switch (error.status) {
-        case 401:
-          throw new Error(this.t("welcome.invalidCredentials"));
-        default:
-          throw new Error(error.message);
-      }
+      const status = error?.response?.status ?? error?.status;
+      const e = new Error(error?.message ?? "Request failed");
+      (e as any).status = status;
+      throw e;
     }
   };
 
@@ -45,12 +41,10 @@ class AuthService {
         },
       });
     } catch (error: any) {
-      switch (error.status) {
-        case 409:
-          throw new Error(this.t("welcome.accountAlreadyExist"));
-        default:
-          throw new Error(this.t("welcome.accountCreateFailed"));
-      }
+      const status = error?.response?.status ?? error?.status;
+      const e = new Error(error?.message ?? "Request failed");
+      (e as any).status = status;
+      throw e;
     }
   };
 
@@ -75,8 +69,11 @@ class AuthService {
         lastLogin: response.data.lastLogin,
         lastUpdated: response.data.lastUpdated,
       };
-    } catch (error) {
-      console.error(error);
+    } catch (error:any) {
+      const status = error?.response?.status ?? error?.status;
+      const e = new Error(error?.message ?? "Request failed");
+      (e as any).status = status;
+      throw e;
     }
   };
 
@@ -93,8 +90,11 @@ class AuthService {
       } else {
         return false;
       }
-    } catch (error) {
-      return false;
+    } catch (error:any) {
+      const status = error?.response?.status ?? error?.status;
+      const e = new Error(error?.message ?? "Request failed");
+      (e as any).status = status;
+      throw e;
     }
   };
 }

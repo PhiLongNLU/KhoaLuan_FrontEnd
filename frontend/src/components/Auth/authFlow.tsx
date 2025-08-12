@@ -106,7 +106,11 @@ const AuthFlow = () => {
       toast.success(t("accountCreated"))
       setCurrentStep(1)
     } catch (error: any) {
-      toast.error(error.message)
+      if ((error as any).status === 409) {
+        toast.error(t("accountAlreadyExist"));
+      } else {
+        toast.error(t("accountCreateFailed"));
+      }
     } finally {
       setLoading(false)
     }
@@ -128,7 +132,11 @@ const AuthFlow = () => {
       toast.success(t("loginSuccess"))
       router.replace("/")
     } catch (error: any) {
-      toast.error(error.message)
+      if ((error as any).status === 401) {
+        toast.error(t("invalidCredentials"));
+      } else {
+        toast.error(t("accountCreateFailed"));
+      }
     } finally {
       setLoading(false)
     }
