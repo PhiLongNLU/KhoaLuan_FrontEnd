@@ -78,7 +78,7 @@ async def create_message(message_data: MessageCreate, current_user: User = Depen
     new_user_message = Message(**message_data.model_dump(exclude={"conversation_id"}), conversation=conversation.id, sender_type="User")
     await new_user_message.insert()
 
-    rag_context = rag_instance.generate_prompt(message_data)
+    rag_context = rag_instance.generate_prompt(message_data.content)
 
     try:
         completion = client.chat.completions.create(
