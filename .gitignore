@@ -69,3 +69,6 @@ backend/.env
 
 # Environment variable files for frontend
 frontend/.env
+
+all_vector_data.json
+all_vector_index.faiss

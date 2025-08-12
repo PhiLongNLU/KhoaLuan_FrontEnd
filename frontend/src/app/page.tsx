@@ -7,8 +7,7 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
   const authService = AuthService.getInstance();
-  const [token, setToken] = useState<string>()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [_, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {

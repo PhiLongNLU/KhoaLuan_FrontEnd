@@ -1,5 +1,5 @@
 import axiosInstance from "@/lib/api";
-import { User, UserAuth } from "@/types/user";
+import { UserAuth } from "@/types/user";
 import { useTranslations } from "next-intl";
 
 class AuthService {

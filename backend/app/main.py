@@ -4,8 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
 
+from app.rag import rag_module
+from app.helpers import helpers
 from app.db.mongo import init_db
-from app.routes import auth, mail, user, conversation, message
+from app.routes import auth, mail, user, conversation, message, rag
 from app.core.response import Response
 
 app = FastAPI()
@@ -18,13 +20,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
 @app.on_event("startup")
 async def start_db():
     try:
         await init_db()
     except Exception as e:
         print(f"Could not connect to the database: {e}")
-
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
@@ -34,7 +37,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             status_code=exc.status_code, message=exc.detail, data=None
         ).model_dump(),
     )
-
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
@@ -53,6 +55,7 @@ app.include_router(mail.route)
 app.include_router(user.route)
 app.include_router(conversation.route)
 app.include_router(message.route)
+app.include_router(rag.route)
 
 @app.get("/", tags=["Root"], response_model=Response[dict])
 async def root():

@@ -1,0 +1,31 @@
+# backend/requirements.in
+# Top-level dependencies for the backend application
+# These are the packages directly imported and used in your code.
+
+fastapi
+uvicorn
+python-dotenv
+beanie # ODM for MongoDB
+motor # Async MongoDB driver, used by Beanie
+fastapi-mail # For email functionalities
+python-jose[cryptography] # For authentication (JWT)
+passlib[bcrypt] # For password hashing
+
+# For RAG and NLP functionalities
+huggingface-hub
+transformers
+sentence-transformers
+faiss-cpu # Or faiss-cpu if GPU is not available/needed
+langdetect
+nltk
+pypdf # If you're processing PDFs for RAG
+python-docx
+python-pptx
+python-multipart
+scikit-learn # Often used for NLP tasks, especially with transformers
+joblib # Common utility, often with scikit-learn
+
+# General utilities / other common packages
+rich # For rich terminal output
+requests # General HTTP client
+google-auth

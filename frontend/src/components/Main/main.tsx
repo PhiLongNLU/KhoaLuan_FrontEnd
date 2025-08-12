@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import ConversationList from './Sidebar/ConversationList';
 import ChatWindow from './Chat/ChatWindow';
 import SpinnerOverlay from '../Share/spinnerOverlay';

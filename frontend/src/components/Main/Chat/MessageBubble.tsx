@@ -32,14 +32,15 @@ const MessageBubble = ({ role, content, ...props }: MessageBubbleProps) => {
         )}
       >
         <ReactMarkdown
-          children={content}
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[
             rehypeSanitize,
             rehypeHighlight,
             rehypeRaw
           ]}
-        />
+        >
+          {content}
+        </ReactMarkdown>
       </div>
     </div>
   )
