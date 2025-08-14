@@ -8,10 +8,12 @@ import { toast } from 'react-toastify'
 import MessageBubble from './MessageBubble'
 import { nanoid } from '@reduxjs/toolkit'
 import TypingIndicator from './TypingIndicator'
+import { useCreateConversationMutation } from '@/store/api/conversationApi'
 
 interface ChatWindowProps {
     setIsLoading: (isLoading: boolean) => void
     currentConversation: string
+    onConversationCreated: (conversationId: string) => void;
 }
 
 type LocalMessage = Message & {
@@ -19,7 +21,7 @@ type LocalMessage = Message & {
     pending?: boolean,
 }
 
-const ChatWindow = ({ setIsLoading, currentConversation }: ChatWindowProps) => {
+const ChatWindow = ({ setIsLoading, currentConversation, onConversationCreated }: ChatWindowProps) => {
     const t = useTranslations('chat')
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const prevConversationRef = useRef<string>(currentConversation)
@@ -27,21 +29,22 @@ const ChatWindow = ({ setIsLoading, currentConversation }: ChatWindowProps) => {
     const [messages, setMessages] = useState<LocalMessage[]>([])
     const [isBotTyping, setIsBotTyping] = useState(false)
 
+    const [createConversation] = useCreateConversationMutation();
+    const [createMessage] = useCreateMessageMutation();
+
     const {
         data: fetchedMessages,
         isLoading: isFetchingMessages,
         error: fetchError,
         isSuccess: isFetchSuccess,
         isError: isFetchError,
+        refetch: refetchMessages,
     } = useGetMessagesQuery(currentConversation, {
         skip: !currentConversation,
     });
 
-    const [createMessage, _] = useCreateMessageMutation();
-
     useEffect(() => {
         if (prevConversationRef.current !== currentConversation) {
-            // conversation thay đổi: reset state
             setMessages([]);
             setIsBotTyping(false);
             prevConversationRef.current = currentConversation;
@@ -109,56 +112,60 @@ const ChatWindow = ({ setIsLoading, currentConversation }: ChatWindowProps) => {
     }, [messages, isBotTyping]);
 
     const handleSendMessage = async (content: string) => {
-        if (!currentConversation) {
-            toast.warn(t('no_conversation_selected'));
-            return;
-        }
         if (!content.trim()) return;
 
+        let conversationIdToUse = currentConversation;
         const clientTempId = nanoid();
-        const newUserMessage: LocalMessage = {
-            id: clientTempId,
-            conversationId: currentConversation,
-            role: "user",
-            content: content,
-            createdAt: new Date(),
-            clientId: clientTempId,
-            pending: true,
-        };
-
-        setMessages(prev => {
-            const merged = [...prev, newUserMessage];
-            merged.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-            return merged;
-        });
-        setIsBotTyping(true);
 
         try {
+            if (!conversationIdToUse) {
+                setIsLoading(true);
+                const newConversation = await createConversation({ title: content.substring(0, 20) + "..." }).unwrap();
+                conversationIdToUse = newConversation.id;
+                onConversationCreated(conversationIdToUse);
+                toast.success(t('conversation_created_success'));
+                setIsLoading(false);
+            }
+
+            const newUserMessage: LocalMessage = {
+                id: clientTempId,
+                conversationId: conversationIdToUse,
+                role: "user",
+                content: content,
+                createdAt: new Date(),
+                clientId: clientTempId,
+                pending: true,
+            };
+
+            setMessages(prev => [...prev, newUserMessage].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()));
+            setIsBotTyping(true);
+
             const serverMsg = await createMessage({
-                conversationId: currentConversation,
+                conversationId: conversationIdToUse,
                 role: "user",
                 content: content,
             }).unwrap();
 
             setMessages(prev => {
                 const hasServerAlready = prev.some(m => m.id === serverMsg.id);
-
                 let updated = prev.filter(m => !(m.pending && m.clientId === clientTempId));
 
                 if (!hasServerAlready) {
                     updated = [...updated, { ...serverMsg } as LocalMessage];
                 }
-
                 updated.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
                 return updated;
             });
+            setIsBotTyping(false);
+            refetchMessages();
 
         } catch (error) {
-            console.error("Lỗi khi gửi tin nhắn:", error);
+            console.error("Lỗi khi gửi tin nhắn hoặc tạo cuộc trò chuyện:", error);
             toast.error(t('send.failure'));
 
-            // rollback user message if fail
             setMessages(prev => prev.filter(m => !(m.pending && m.clientId === clientTempId)));
+        } finally {
+            setIsLoading(false);
             setIsBotTyping(false);
         }
     };

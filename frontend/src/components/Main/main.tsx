@@ -19,7 +19,9 @@ const MainPage = () => {
       />
       <ChatWindow
         setIsLoading={setIsLoading}
-        currentConversation={currentConversation} />
+        currentConversation={currentConversation}
+        onConversationCreated={setCurrentConversation}
+      />
     </div>
   </>
   )

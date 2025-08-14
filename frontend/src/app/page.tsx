@@ -16,15 +16,20 @@ export default function Home() {
       const tokenRes = sessionStorage.getItem("access_token");
 
       if (tokenRes) {
-        const isValidToken = await authService.verify(tokenRes);
-
-        if (isValidToken) {
-          setIsAuthenticated(true);
-          router.replace("/home");
-        } else {
+        try {
+          const isValidToken = await authService.verify(tokenRes);
+          if (isValidToken) {
+            setIsAuthenticated(true);
+            router.replace("/home");
+          } else {
+            setIsAuthenticated(false);
+          }
+        }
+        catch {
           setIsAuthenticated(false);
           router.replace("/auth");
         }
+
       } else {
         setIsAuthenticated(false);
         router.replace("/auth");

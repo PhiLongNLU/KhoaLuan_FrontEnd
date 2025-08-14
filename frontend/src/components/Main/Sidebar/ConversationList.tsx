@@ -33,10 +33,8 @@ const ConversationList = ({
     error: fetchError
   } = useGetConversationsQuery();
 
-  const [createConversation, { isLoading: isCreatingConversation }] = useCreateConversationMutation();
-
   useEffect(() => {
-    setIsLoading(isFetchingConversations || isCreatingConversation);
+    setIsLoading(isFetchingConversations);
 
     if (fetchError) {
       console.error("Lỗi khi fetch conversations:", fetchError);
@@ -58,7 +56,6 @@ const ConversationList = ({
     }
   }, [
     isFetchingConversations,
-    isCreatingConversation,
     setIsLoading,
     fetchError,
     setCurrentConversation,
@@ -70,20 +67,7 @@ const ConversationList = ({
   }
 
   const handleCreate = async () => {
-
-    const defaultTitle = t('create.default_title')
-
-    try {
-      const newConversation = await createConversation({ title: defaultTitle }).unwrap()
-
-      toast.success(t('create.success'));
-
-      setCurrentConversation(newConversation.id);
-
-    } catch (error: any) {
-      console.error("Lỗi khi tạo cuộc trò chuyện:", error);
-      toast.error(t('create.failure'))
-    }
+    setCurrentConversation("")
   }
 
   const handleSelect = (id: string) => {
@@ -128,9 +112,9 @@ const ConversationList = ({
 
         {isOpen ? (
           <SubmitButton
-            title={isCreatingConversation ? t('create.creating') : t('create.create-chat')}
+            title={t('create.create-chat')}
             onClick={handleCreate}
-            disabled={isCreatingConversation} />
+          />
         ) : (
           <button onClick={handleCreate} className='hover:cursor-pointer'>
             <Icon icon={"typcn:plus"} width={30} height={30} />
