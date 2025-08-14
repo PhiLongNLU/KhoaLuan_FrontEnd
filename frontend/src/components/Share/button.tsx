@@ -18,7 +18,7 @@ const SubmitButton = ({ title, mode, onClick, parentClassname, ...props }: Submi
     <button
       {...props}
       onClick={onClick}
-      className={`w-full font-medium rounded-lg text-base px-5 py-2.5 ${getColorWMode()} ${parentClassname}`}
+      className={`w-full font-medium rounded-lg text-base px-5 py-2.5 ${getColorWMode()} ${parentClassname} hover:cursor-pointer`}
     >
       {title}
     </button>

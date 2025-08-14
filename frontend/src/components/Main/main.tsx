@@ -11,7 +11,7 @@ const MainPage = () => {
 
   return (<>
     {isLoading && <SpinnerOverlay />}
-    <div className='flex h-screen'>
+    <div className='flex h-screen static'>
       <ConversationList
         setIsLoading={setIsLoading}
         setCurrentConversation={setCurrentConversation}
@@ -19,7 +19,9 @@ const MainPage = () => {
       />
       <ChatWindow
         setIsLoading={setIsLoading}
-        currentConversation={currentConversation} />
+        currentConversation={currentConversation}
+        onConversationCreated={setCurrentConversation}
+      />
     </div>
   </>
   )

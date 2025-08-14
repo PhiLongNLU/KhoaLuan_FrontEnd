@@ -2,12 +2,14 @@
 import SubmitButton from '@/components/Share/button'
 import Search from '@/components/Share/search'
 import clsx from 'clsx'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ProfileBar from './ProfileBar'
 import ConversationItem from './ConversationItem'
 import { toast } from 'react-toastify'
 import { useTranslations } from 'next-intl'
-import { useCreateConversationMutation, useGetConversationsQuery } from '@/store/api/conversationApi'
+import { useDeleteConversationMutation, useGetConversationsQuery, useRenameConversationMutation } from '@/store/api/conversationApi'
+import { Icon } from '@iconify/react/dist/iconify.js'
+import Image from 'next/image'
 
 interface ConverstationListProp {
   setIsLoading: (isLoading: boolean) => void
@@ -23,6 +25,7 @@ const ConversationList = ({
 }: ConverstationListProp) => {
 
   const t = useTranslations('conversation')
+  const [isOpen, setIsOpen] = useState(false)
 
   const {
     data: conversations,
@@ -30,10 +33,11 @@ const ConversationList = ({
     error: fetchError
   } = useGetConversationsQuery();
 
-  const [createConversation, { isLoading: isCreatingConversation }] = useCreateConversationMutation();
+  const [deleteConversation, { isLoading: isDeletingConversation }] = useDeleteConversationMutation();
+  const [renameConversation, { isLoading: isRenamingConversation }] = useRenameConversationMutation();
 
   useEffect(() => {
-    setIsLoading(isFetchingConversations || isCreatingConversation);
+    setIsLoading(isFetchingConversations || isDeletingConversation || isRenamingConversation);
 
     if (fetchError) {
       console.error("Lỗi khi fetch conversations:", fetchError);
@@ -55,7 +59,8 @@ const ConversationList = ({
     }
   }, [
     isFetchingConversations,
-    isCreatingConversation,
+    isDeletingConversation,
+    isRenamingConversation,
     setIsLoading,
     fetchError,
     setCurrentConversation,
@@ -67,32 +72,56 @@ const ConversationList = ({
   }
 
   const handleCreate = async () => {
-
-    const defaultTitle = t('create.default_title')
-
-    try {
-      const newConversation = await createConversation({ title: defaultTitle }).unwrap()
-
-      toast.success(t('create.success'));
-
-      setCurrentConversation(newConversation.id);
-
-    } catch (error: any) {
-      console.error("Lỗi khi tạo cuộc trò chuyện:", error);
-      toast.error(t('create.failure'))
-    }
+    setCurrentConversation("")
   }
 
   const handleSelect = (id: string) => {
     setCurrentConversation(id)
   }
 
+  const handleDelete = async (conversationId: string) => {
+    if (!confirm(t('delete.confirm'))) { 
+      return;
+    }
+    try {
+      await deleteConversation(conversationId).unwrap();
+      toast.success(t('delete.success'));
+      if (currentConversation === conversationId) {
+        setCurrentConversation("");
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa cuộc trò chuyện:", error);
+      toast.error(t('delete.failure'));
+    }
+  };
+
+  const handleRename = async (conversationId: string, newTitle: string) => {
+    if (!newTitle.trim()) {
+      toast.error(t('rename.empty_title_error'));
+      return;
+    }
+    try {
+      await renameConversation({ conversationId, title: newTitle }).unwrap();
+      toast.success(t('rename.success'));
+    } catch (error) {
+      console.error("Lỗi khi đổi tên cuộc trò chuyện:", error);
+      // Kiểm tra nếu lỗi từ server có detail cụ thể
+      let errorMessage: string = t('rename.failure');
+      if (typeof error === 'object' && error !== null && 'data' in error && typeof (error as any).data === 'object' && (error as any).data !== null && 'detail' in (error as any).data) {
+        errorMessage = (error as any).data.detail;
+      }
+      toast.error(errorMessage);
+    }
+  };
+
   return (
     <div
       {...props}
       className={clsx(
         `flex flex-col justify-center items-center`,
-        "w-1/5 h-full",
+        "lg:static absolute",
+        "h-full",
+        isOpen ? "lg:w-1/5 w-1/2" : "w-[70px]",
         "p-4"
       )}
     >
@@ -102,15 +131,35 @@ const ConversationList = ({
         "p-5",
         "bg-[#FDF0F4]", "rounded-lg")}
       >
-        <div className="w-full flex items-center justify-between">
-          <h1 className="text-3xl font-bold">AnyChat</h1>
+        <div className={
+          clsx(
+            "w-full flex items-center justify-between",
+            isOpen ? "flex-row" : "flex-col",
+            isOpen ? "items-center justify-between" : "gap-2"
+          )
+        }>
+
+          <button className={
+            clsx(
+              "p-2 hover:bg-gray-100 hover:cursor-pointer rounded-full"
+            )
+          } onClick={() => setIsOpen(!isOpen)}>
+            <Icon icon={"mingcute:menu-line"} width={20} height={20} />
+          </button>
+
           <Search onClick={handleSearch} />
         </div>
 
-        <SubmitButton
-          title={isCreatingConversation ? t('create.creating') : t('create.create-chat')}
-          onClick={handleCreate}
-          disabled={isCreatingConversation} />
+        {isOpen ? (
+          <SubmitButton
+            title={t('create.create-chat')}
+            onClick={handleCreate}
+          />
+        ) : (
+          <button onClick={handleCreate} className='hover:cursor-pointer'>
+            <Icon icon={"typcn:plus"} width={30} height={30} />
+          </button>
+        )}
 
         <div className="w-full flex flex-col gap-0.5 flex-grow overflow-x-hidden overflow-y-auto">
           {isFetchingConversations ? (
@@ -125,14 +174,23 @@ const ConversationList = ({
                 key={conversation.id}
                 id={conversation.id}
                 title={conversation.title}
-                onSelected={()=>handleSelect(conversation.id)}
+                onSelected={() => handleSelect(conversation.id)}
                 selected={currentConversation == conversation.id}
+                onDeleted={handleDelete}
+                onRenamed={handleRename}
               />
             ))
           )}
         </div>
 
-        <ProfileBar />
+        {isOpen ?
+          <ProfileBar />
+          :
+          <button onClick={handleCreate} className='size-8 hover:cursor-pointer'>
+            <Image src={"/profile.png"} alt='User Avatar'
+              className="border rounded-full hover:cursor-pointer hover:bg-grey-200 overflow-hidden text-sm" width={36} height={36} />
+          </button>
+        }
       </div>
     </div>
   )

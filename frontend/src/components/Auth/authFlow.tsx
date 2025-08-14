@@ -11,6 +11,7 @@ import { EncryptService } from "@/services/encrypt.service";
 import SpinnerOverlay from "../Share/spinnerOverlay";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import clsx from "clsx";
 
 const AuthFlow = () => {
   const authService = AuthService.getInstance()
@@ -132,11 +133,11 @@ const AuthFlow = () => {
       toast.success(t("loginSuccess"))
       router.replace("/")
     } catch (error: any) {
-      if ((error as any).status === 401) {
+      // if ((error as any).status === 401) {
         toast.error(t("invalidCredentials"));
-      } else {
-        toast.error(t("accountCreateFailed"));
-      }
+      // } else {
+      //   toast.error(t("accountCreateFailed"));
+      // }
     } finally {
       setLoading(false)
     }
@@ -225,7 +226,11 @@ const AuthFlow = () => {
   const t = useTranslations("welcome");
 
   return (
-    <div className="relative w-[560px] h-[472px] bg-white rounded-2xl shadow-lg border-2 border-pink-300 flex items-center justify-center">
+    <div className={clsx(
+      "relative",
+      "md:w-[560px] md:h-[472px] w-full h-full",
+      "bg-white rounded-2xl shadow-lg border-2 border-pink-300 flex items-center justify-center"
+    )}>
       {currentStep !== 1 && (
         <button
           className="absolute top-5 left-4"
