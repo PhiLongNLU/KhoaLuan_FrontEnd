@@ -164,7 +164,7 @@ const ChatWindow = ({ setIsLoading, currentConversation }: ChatWindowProps) => {
     };
 
     return (
-        <div className="w-4/5 flex flex-col items-center justify-end p-4">
+        <div className="flex flex-grow flex-col items-center justify-end p-4">
 
             <div className="flex-grow w-full overflow-y-auto">
                 {isFetchingMessages ? (

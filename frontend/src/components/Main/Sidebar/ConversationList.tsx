@@ -2,12 +2,14 @@
 import SubmitButton from '@/components/Share/button'
 import Search from '@/components/Share/search'
 import clsx from 'clsx'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ProfileBar from './ProfileBar'
 import ConversationItem from './ConversationItem'
 import { toast } from 'react-toastify'
 import { useTranslations } from 'next-intl'
 import { useCreateConversationMutation, useGetConversationsQuery } from '@/store/api/conversationApi'
+import { Icon } from '@iconify/react/dist/iconify.js'
+import Image from 'next/image'
 
 interface ConverstationListProp {
   setIsLoading: (isLoading: boolean) => void
@@ -23,6 +25,7 @@ const ConversationList = ({
 }: ConverstationListProp) => {
 
   const t = useTranslations('conversation')
+  const [isOpen, setIsOpen] = useState(false)
 
   const {
     data: conversations,
@@ -92,7 +95,9 @@ const ConversationList = ({
       {...props}
       className={clsx(
         `flex flex-col justify-center items-center`,
-        "w-1/5 h-full",
+        "lg:static absolute",
+        "h-full",
+        isOpen ? "lg:w-1/5 w-1/2" : "w-[70px]",
         "p-4"
       )}
     >
@@ -102,15 +107,35 @@ const ConversationList = ({
         "p-5",
         "bg-[#FDF0F4]", "rounded-lg")}
       >
-        <div className="w-full flex items-center justify-between">
-          <h1 className="text-3xl font-bold">AnyChat</h1>
+        <div className={
+          clsx(
+            "w-full flex items-center justify-between",
+            isOpen ? "flex-row" : "flex-col",
+            isOpen ? "items-center justify-between" : "gap-2"
+          )
+        }>
+
+          <button className={
+            clsx(
+              "p-2 hover:bg-gray-100 hover:cursor-pointer rounded-full"
+            )
+          } onClick={() => setIsOpen(!isOpen)}>
+            <Icon icon={"mingcute:menu-line"} width={20} height={20} />
+          </button>
+
           <Search onClick={handleSearch} />
         </div>
 
-        <SubmitButton
-          title={isCreatingConversation ? t('create.creating') : t('create.create-chat')}
-          onClick={handleCreate}
-          disabled={isCreatingConversation} />
+        {isOpen ? (
+          <SubmitButton
+            title={isCreatingConversation ? t('create.creating') : t('create.create-chat')}
+            onClick={handleCreate}
+            disabled={isCreatingConversation} />
+        ) : (
+          <button onClick={handleCreate} className='hover:cursor-pointer'>
+            <Icon icon={"typcn:plus"} width={30} height={30} />
+          </button>
+        )}
 
         <div className="w-full flex flex-col gap-0.5 flex-grow overflow-x-hidden overflow-y-auto">
           {isFetchingConversations ? (
@@ -125,14 +150,21 @@ const ConversationList = ({
                 key={conversation.id}
                 id={conversation.id}
                 title={conversation.title}
-                onSelected={()=>handleSelect(conversation.id)}
+                onSelected={() => handleSelect(conversation.id)}
                 selected={currentConversation == conversation.id}
               />
             ))
           )}
         </div>
 
-        <ProfileBar />
+        {isOpen ?
+          <ProfileBar />
+          :
+          <button onClick={handleCreate} className='size-8 hover:cursor-pointer'>
+            <Image src={"/profile.png"} alt='User Avatar'
+              className="border rounded-full hover:cursor-pointer hover:bg-grey-200 overflow-hidden text-sm" width={36} height={36} />
+          </button>
+        }
       </div>
     </div>
   )

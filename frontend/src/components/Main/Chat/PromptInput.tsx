@@ -29,15 +29,15 @@ const PromptInput = ({ onSendMessage }: PromptInputProps) => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Ask anything..."
-                className="bg-red-200 flex-grow focus:outline-none text-gray-900 bg-white"
+                className="bg-red-200 min-w-0 flex-1 focus:outline-none text-gray-900 bg-white pr-2"
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
             />
-            <div
+            <button type='button'
                 className="cursor-pointer"
                 onClick={handleSend}
             >
                 <Icon icon={"mynaui:send-solid"} width={iconSize} height={iconSize} />
-            </div>
+            </button>
         </div>
     )
 }
