@@ -7,7 +7,7 @@ import ProfileBar from './ProfileBar'
 import ConversationItem from './ConversationItem'
 import { toast } from 'react-toastify'
 import { useTranslations } from 'next-intl'
-import { useCreateConversationMutation, useGetConversationsQuery } from '@/store/api/conversationApi'
+import { useDeleteConversationMutation, useGetConversationsQuery, useRenameConversationMutation } from '@/store/api/conversationApi'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import Image from 'next/image'
 
@@ -33,8 +33,11 @@ const ConversationList = ({
     error: fetchError
   } = useGetConversationsQuery();
 
+  const [deleteConversation, { isLoading: isDeletingConversation }] = useDeleteConversationMutation();
+  const [renameConversation, { isLoading: isRenamingConversation }] = useRenameConversationMutation();
+
   useEffect(() => {
-    setIsLoading(isFetchingConversations);
+    setIsLoading(isFetchingConversations || isDeletingConversation || isRenamingConversation);
 
     if (fetchError) {
       console.error("Lỗi khi fetch conversations:", fetchError);
@@ -56,6 +59,8 @@ const ConversationList = ({
     }
   }, [
     isFetchingConversations,
+    isDeletingConversation,
+    isRenamingConversation,
     setIsLoading,
     fetchError,
     setCurrentConversation,
@@ -73,6 +78,41 @@ const ConversationList = ({
   const handleSelect = (id: string) => {
     setCurrentConversation(id)
   }
+
+  const handleDelete = async (conversationId: string) => {
+    if (!confirm(t('delete.confirm'))) { 
+      return;
+    }
+    try {
+      await deleteConversation(conversationId).unwrap();
+      toast.success(t('delete.success'));
+      if (currentConversation === conversationId) {
+        setCurrentConversation("");
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa cuộc trò chuyện:", error);
+      toast.error(t('delete.failure'));
+    }
+  };
+
+  const handleRename = async (conversationId: string, newTitle: string) => {
+    if (!newTitle.trim()) {
+      toast.error(t('rename.empty_title_error'));
+      return;
+    }
+    try {
+      await renameConversation({ conversationId, title: newTitle }).unwrap();
+      toast.success(t('rename.success'));
+    } catch (error) {
+      console.error("Lỗi khi đổi tên cuộc trò chuyện:", error);
+      // Kiểm tra nếu lỗi từ server có detail cụ thể
+      let errorMessage: string = t('rename.failure');
+      if (typeof error === 'object' && error !== null && 'data' in error && typeof (error as any).data === 'object' && (error as any).data !== null && 'detail' in (error as any).data) {
+        errorMessage = (error as any).data.detail;
+      }
+      toast.error(errorMessage);
+    }
+  };
 
   return (
     <div
@@ -136,6 +176,8 @@ const ConversationList = ({
                 title={conversation.title}
                 onSelected={() => handleSelect(conversation.id)}
                 selected={currentConversation == conversation.id}
+                onDeleted={handleDelete}
+                onRenamed={handleRename}
               />
             ))
           )}
