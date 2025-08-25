@@ -152,20 +152,26 @@ async def create_message_with_rag(
         return await asyncio.to_thread(_run)
 
     # 5) Run all three calls concurrently
-    try:
-        ft_rag_ans, raw_ans, ft_only_ans = await asyncio.gather(
-            call_finetuned_with_rag(),
-            call_raw_model(),
-            call_finetuned_only(),
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get response from chatbot: {e}"
-        )
+    results = await asyncio.gather(
+        call_finetuned_with_rag(),
+        call_raw_model(),
+        call_finetuned_only(),
+        return_exceptions=True
+    )
 
-    # 6) Combine to one bot message content
-    rsp_content = "\n\n".join([ft_rag_ans, raw_ans, ft_only_ans])
+    answers = []
+    labels = ["Fine-tuned + RAG", "Raw-model", "Fine-tuned"]
+
+    for label, res in zip(labels, results):
+        if isinstance(res, Exception):
+            # Ghi log chi tiết
+            import traceback
+            traceback.print_exception(res)
+            answers.append(f"**{label}:** <error: {res}>")
+        else:
+            answers.append(res)
+
+    rsp_content = "\n\n".join(answers)
 
     new_bot_message = Message(
         conversation=conversation.id,
